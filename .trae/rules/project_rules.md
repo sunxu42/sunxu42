@@ -1,0 +1,6 @@
+1. 这是一个react17的项目，在修改代码时应该优先考虑最新的hooks，latest version of react.
+2. 项目中使用了tailwindcss，在修改tailwindcss配置时，应该优先考虑最新的tailwindcss版本。
+3. 项目中使用了zustand，在修改zustand状态管理时，应该优先考虑最新的zustand版本。
+4. 项目中使用了next.js，在修改next.js配置时，应该优先考虑最新的next.js版本。
+5. 项目中使用了typescript，在修改typescript配置时，应该优先考虑最新的typescript版本。
+6. 项目中引入了shadcn/ui，在修改shadcn/ui组件时，应该优先考虑最新的shadcn/ui版本。
