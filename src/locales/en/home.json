@@ -1,0 +1,21 @@
+{
+  "title": "Welcome Home",
+  "subtitle": "Discover new possibilities",
+  "welcomeMessage": "Hello, {name}! Welcome back to your dashboard.",
+  "features": "Features",
+  "feature1": {
+    "title": "Dashboard",
+    "description": "Track your activities and progress"
+  },
+  "feature2": {
+    "title": "Analytics",
+    "description": "Get insights from your data"
+  },
+  "feature3": {
+    "title": "Settings",
+    "description": "Customize your experience"
+  },
+  "recentActivities": "Recent Activities",
+  "noActivities": "No recent activities",
+  "viewAll": "View All"
+}

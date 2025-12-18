@@ -1,0 +1,19 @@
+{
+  "title": "Login",
+  "subtitle": "Welcome back",
+  "email": "Email",
+  "password": "Password",
+  "rememberMe": "Remember me",
+  "loginButton": "Log in",
+  "loginButtonPending": "Logging in...",
+  "forgotPassword": "Forgot password?",
+  "noAccount": "Don't have an account?",
+  "register": "Register",
+  "error": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "loginFailed": "Login failed. Please check your credentials and try again."
+  }
+}

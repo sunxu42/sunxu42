@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderWrapper from "./header-wrapper";
+import { NextIntlClientProvider } from 'next-intl/react';
+import { getMessages } from 'next-intl/server';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,20 +27,26 @@ export const viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params: { locale },
 }: Readonly<{
   children: React.ReactNode;
+  params: { locale: string };
 }>) {
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang={locale} className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-200`}
       >
-        <HeaderWrapper />
-        <main className="min-h-screen w-full flex justify-center px-4 sm:px-6">
-          {children}
-        </main>
+        <NextIntlClientProvider messages={messages}>
+          <HeaderWrapper />
+          <main className="min-h-screen w-full flex justify-center px-4 sm:px-6">
+            {children}
+          </main>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

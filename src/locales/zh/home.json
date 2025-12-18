@@ -1,0 +1,13 @@
+{
+  "title": "首页",
+  "welcome": "欢迎回来",
+  "dashboard": "仪表板",
+  "overview": "概览",
+  "recentActivity": "最近活动",
+  "quickActions": "快速操作",
+  "viewProfile": "查看个人资料",
+  "settings": "设置",
+  "logout": "退出登录",
+  "noActivity": "暂无活动记录",
+  "loading": "加载中..."
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Profile",
+  "subtitle": "Manage your account settings",
+  "basicInfo": "Basic Information",
+  "name": "Name",
+  "email": "Email",
+  "updateButton": "Update Profile",
+  "updateButtonPending": "Updating...",
+  "success": "Profile updated successfully",
+  "error": {
+    "nameRequired": "Name is required",
+    "nameMinLength": "Name must be at least 2 characters",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "updateFailed": "Failed to update profile. Please try again."
+  }
+}

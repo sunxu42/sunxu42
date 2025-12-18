@@ -10,6 +10,7 @@ import { useAuthStore, initializeAuth } from "@/lib/store/auth";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { loginRequestSchema } from "@/lib/schemas/auth";
+import { useTranslations } from 'next-intl';
 
 // 从cookie中获取token
 const getTokenFromCookie = (): string | null => {
@@ -26,6 +27,7 @@ export default function LoginPage() {
   }>({});
   const [error, setError] = useState("");
   const login = useAuthStore(state => state.login);
+  const t = useTranslations();
 
   // 检查是否有token，如果有则跳转到home页面
   useEffect(() => {
@@ -117,7 +119,7 @@ export default function LoginPage() {
         className="w-full cursor-pointer"
         disabled={pending}
       >
-        {pending ? "登录中..." : "登录"}
+        {pending ? t('loginButtonPending') : t('loginButton')}
       </Button>
     );
   }
@@ -126,7 +128,7 @@ export default function LoginPage() {
     <div className="min-w-[280px] md:min-w-[480px] max-w-[480px] flex min-h-screen items-center justify-center p-4">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">登录</CardTitle>
+          <CardTitle className="text-2xl">{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={handleLogin} className="space-y-4">
@@ -136,12 +138,12 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="请输入邮箱"
+                placeholder={t('email')}
                 className={`w-full p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
               />
               {fieldErrors.email && (
@@ -149,12 +151,12 @@ export default function LoginPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
-                placeholder="请输入密码"
+                placeholder={t('password')}
                 className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.password ? "border-red-500" : "border-gray-300"}`}
               />
               {fieldErrors.password && (
