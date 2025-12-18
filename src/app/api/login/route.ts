@@ -20,12 +20,13 @@ export async function POST(req: NextRequest) {
     );
 
     if (userResult.rows.length > 0) {
-      // 用户存在，验证密码
-      const user = userResult.rows[0];
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        user.password_hash
-      );
+        // 用户存在，使用数据库的crypt函数验证密码
+        const user = userResult.rows[0];
+        const passwordCheckResult = await pool.query(
+          "SELECT crypt($1, $2) = $2 AS is_valid",
+          [password, user.password_hash]
+        );
+        const isPasswordValid = passwordCheckResult.rows[0].is_valid;
 
       if (isPasswordValid) {
         // 更新最后登录时间
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
         // 设置token到cookie
         response.cookies.set("token", token, {
           httpOnly: true,
-          secure: true,
+          secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
           maxAge: 4 * 60 * 60, // 4小时
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
         // 设置refresh token到cookie
         response.cookies.set("refresh_token", refreshToken, {
           httpOnly: true,
-          secure: true,
+          secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
           maxAge: 7 * 24 * 60 * 60, // 7天
@@ -102,18 +103,16 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // 用户不存在，创建新用户
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      const userId = uuidv4();
-      const username = email.split("@")[0]; // 使用邮箱前缀作为默认用户名
+        const userId = uuidv4();
+        const username = email.split("@")[0]; // 使用邮箱前缀作为默认用户名
 
-      await pool.query(
-        `INSERT INTO auth.users (
-          user_id, username, email, password_hash, status, 
-          created_at, updated_at, last_login_at, last_login_ip
-        ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), NOW(), $6)`,
-        [userId, username, email, hashedPassword, "active", "unknown"]
-      );
+        await pool.query(
+          `INSERT INTO auth.users (
+            user_id, username, email, password_hash, status, 
+            created_at, updated_at, last_login_at, last_login_ip
+          ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), NOW(), $6)`,
+          [userId, username, email, password, "active", "unknown"]
+        );
 
       // 生成JWT token
       const token = jwt.sign(

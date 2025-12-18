@@ -1,15 +1,15 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore, initializeAuth } from "@/lib/store/auth";
+import { useAuthStore } from "@/lib/store/auth";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { loginRequestSchema } from "@/lib/schemas/auth";
+import { useTranslations } from 'next-intl';
 
 // 从cookie中获取token
 const getTokenFromCookie = (): string | null => {
@@ -20,12 +20,15 @@ const getTokenFromCookie = (): string | null => {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
     password?: string;
   }>({});
   const [error, setError] = useState("");
   const login = useAuthStore(state => state.login);
+  const t = useTranslations();
 
   // 检查是否有token，如果有则跳转到home页面
   useEffect(() => {
@@ -44,8 +47,8 @@ export default function LoginPage() {
         return;
       }
 
-      // 最后尝试初始化auth状态（处理异步初始化的情况）
-      await initializeAuth();
+      // 最后尝试检查auth状态（处理异步初始化的情况）
+      await useAuthStore.getState().checkAuthStatus();
 
       // 再次检查登录状态
       const updatedIsLoggedIn = useAuthStore.getState().isLoggedIn;
@@ -57,16 +60,13 @@ export default function LoginPage() {
     checkAuth();
   }, [router]);
 
-  // 表单提交处理函数，作为form action使用
-  const handleLogin = async (formData: FormData) => {
+  // 表单提交处理函数
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError("");
     setFieldErrors({});
 
     try {
-      // 从FormData中获取表单数据
-      const email = formData.get("email") as string;
-      const password = formData.get("password") as string;
-
       // 客户端验证表单数据
       loginRequestSchema.parse({ email, password });
 
@@ -107,41 +107,30 @@ export default function LoginPage() {
     }
   };
 
-  // 表单状态组件
-  function SubmitButton() {
-    const { pending } = useFormStatus();
 
-    return (
-      <Button
-        type="submit"
-        className="w-full cursor-pointer"
-        disabled={pending}
-      >
-        {pending ? "登录中..." : "登录"}
-      </Button>
-    );
-  }
 
   return (
     <div className="min-w-[280px] md:min-w-[480px] max-w-[480px] flex min-h-screen items-center justify-center p-4">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">登录</CardTitle>
+          <CardTitle className="text-2xl">{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             {error && (
               <div className="p-2 bg-red-100 text-red-700 rounded-md text-sm">
                 {error}
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="请输入邮箱"
+                placeholder={t('email')}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className={`w-full p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
               />
               {fieldErrors.email && (
@@ -149,19 +138,26 @@ export default function LoginPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
-                placeholder="请输入密码"
+                placeholder={t('password')}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.password ? "border-red-500" : "border-gray-300"}`}
               />
               {fieldErrors.password && (
                 <p className="text-red-500 text-sm">{fieldErrors.password}</p>
               )}
             </div>
-            <SubmitButton />
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+            >
+              {t('loginButton')}
+            </Button>
           </form>
         </CardContent>
       </Card>

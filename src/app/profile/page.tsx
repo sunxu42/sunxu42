@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/lib/store/auth";
 import { useRouter } from "next/navigation";
 import { profileUpdateSchema } from "@/lib/schemas/auth";
+import { useTranslations } from 'next-intl';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ProfilePage() {
     gender?: string;
     bio?: string;
   }>({});
+  const t = useTranslations();
 
   // 如果用户未登录，重定向到登录页面
   useEffect(() => {
@@ -117,7 +119,7 @@ export default function ProfilePage() {
 
     return (
       <Button type="submit" disabled={pending} className="cursor-pointer">
-        {pending ? "更新中..." : "保存更改"}
+        {pending ? t('updateButtonPending') : t('updateButton')}
       </Button>
     );
   }
@@ -129,12 +131,12 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="min-w-[280px] md:min-w-[600px] max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">账号设置</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('title')}</h1>
 
         <form action={handleUpdateProfile} className="space-y-6 p-6 bg-white">
           {successMessage && (
             <div className="p-3 bg-green-100 text-green-800 rounded-md text-sm">
-              {successMessage}
+              {t('success')}
             </div>
           )}
 
@@ -146,7 +148,7 @@ export default function ProfilePage() {
 
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="user_id">用户ID</Label>
+              <Label htmlFor="user_id">User ID</Label>
               <Input
                 id="user_id"
                 type="text"
@@ -157,7 +159,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 name="email"
@@ -248,7 +250,7 @@ export default function ProfilePage() {
               onClick={() => router.push("/")}
               className="cursor-pointer"
             >
-              取消
+              Cancel
             </Button>
             <SubmitButton />
           </div>

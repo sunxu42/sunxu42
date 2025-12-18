@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderWrapper from "./header-wrapper";
-import { NextIntlClientProvider } from 'next-intl/react';
+import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import ClientHtml from '@/components/ClientHtml';
+import { cookies } from 'next/headers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,17 +31,21 @@ export const viewport = {
 
 export default async function RootLayout({
   children,
-  params: { locale },
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
 }>) {
-  const messages = await getMessages();
+  // 从Cookie获取语言偏好，默认中文
+  const cookieStore = await cookies();
+  const userLocale = cookieStore.get('user-locale')?.value;
+  const locale = ['en', 'zh'].includes(userLocale as any) ? userLocale : 'zh';
+  
+  // 加载对应语言的翻译文案
+  const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale} className="scroll-smooth">
+    <ClientHtml>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-200`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <NextIntlClientProvider messages={messages}>
           <HeaderWrapper />
@@ -48,6 +54,6 @@ export default async function RootLayout({
           </main>
         </NextIntlClientProvider>
       </body>
-    </html>
+    </ClientHtml>
   );
 }

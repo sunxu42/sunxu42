@@ -13,16 +13,7 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  // 监听主题变化，确保DOM类名始终与主题状态一致
-  useEffect(() => {
-    if (mounted) {
-      if (theme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-  }, [theme, mounted]);
+
 
   // 在服务器端渲染时返回一个固定的内容，避免水合不匹配
   if (!mounted) {

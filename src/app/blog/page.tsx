@@ -32,7 +32,7 @@ export default function BlogPage() {
           {posts.map(post => (
             <Card
               key={post.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md cursor-pointer"
             >
               <CardHeader>
                 <CardTitle className="text-xl">{post.title}</CardTitle>
