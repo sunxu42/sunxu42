@@ -116,13 +116,14 @@
 }
 
 @layer base {
-  *:not(a) {
+  .theme-toggle-transition {
     @apply border-border outline-ring/50;
     /* 添加全局主题切换过渡动画 */
     transition-property: background-color, background-image, border-color, color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 3000ms;
+    transition-duration: 300ms;
   }
+
   body {
     @apply bg-background text-foreground;
   }

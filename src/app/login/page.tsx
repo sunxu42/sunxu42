@@ -107,8 +107,6 @@ export default function LoginPage() {
     }
   };
 
-
-
   return (
     <div className="min-w-[280px] md:min-w-[480px] max-w-[480px] flex min-h-screen items-center justify-center p-4">
       <Card className="w-full">

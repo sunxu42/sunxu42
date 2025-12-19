@@ -24,8 +24,8 @@ export function Header() {
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6">
         {/* 应用名称 */}
         <div className="flex items-center gap-2">
-          <div className="text-xl font-bold tracking-tight text-primary hover:text-primary/90">
-            <Link href="/" className="cursor-pointer flex items-center gap-2">
+          <div className="text-xl font-bold tracking-tight text-primary">
+            <Link href="/" className="cursor-pointer flex items-center gap-2 hover:text-primary/90 hover:scale-105 theme-toggle-transition">
               <span>sunxu42</span>
             </Link>
           </div>
@@ -63,7 +63,7 @@ export function Header() {
                   <img
                     src={user.photo}
                     alt={`${user.username}的头像`}
-                    className="w-9 h-9 rounded-full object-cover hover:scale-110"
+                    className="w-9 h-9 rounded-full object-cover transition-transform duration-200 hover:scale-110"
                   />
                 ) : (
                   // 如果没有头像图片，显示彩色首字母头像
@@ -79,7 +79,7 @@ export function Header() {
               <Button
                 variant="default"
                 size="sm"
-                className="cursor-pointer rounded-full hover:scale-105"
+                className="cursor-pointer rounded-full transition-transform duration-200 hover:scale-105"
               >
                 {t('login')}
               </Button>

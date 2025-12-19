@@ -45,11 +45,11 @@ export default async function RootLayout({
   return (
     <ClientHtml>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground`}
       >
         <NextIntlClientProvider messages={messages}>
           <HeaderWrapper />
-          <main className="min-h-screen w-full flex justify-center px-4 sm:px-6">
+          <main className="w-full flex justify-center px-4 sm:px-6">
             {children}
           </main>
         </NextIntlClientProvider>
