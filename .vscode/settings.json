@@ -14,11 +14,26 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "explicit"
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit", // 核心：自动整理导入（删除无效 + 排序）
+    "source.fixAll.eslint": "explicit", // 自动修复 ESLint 错误（包括未使用变量提示）
+    "source.fixAll.prettier": "explicit" // 自动执行 Prettier 格式化
+  },
+  "javascript.preferences.organizeImportsIgnoreCase": false,
+  // 排除不需要处理的文件
+  "files.exclude": {
+    "**/.next": true,
+    "**/node_modules": true
   },
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
   "javascript.preferences.importModuleSpecifier": "relative",
-  "javascript.suggest.autoImports": true
+  "javascript.suggest.autoImports": true,
+  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.organizeImportsIgnoreCase": false,
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+  "files.eol": "\n"
 }

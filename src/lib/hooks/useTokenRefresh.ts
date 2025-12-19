@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { useAuthStore } from "@/lib/store/auth";
+import { useEffect } from "react";
 
 /**
  * Token刷新钩子，用于自动检测和刷新过期的token
@@ -59,10 +59,7 @@ export function withTokenRefresh<T>(requestFn: () => Promise<T>): Promise<T> {
           response?: { status: number };
           message?: string;
         };
-        if (
-          errorObj.response?.status === 401 ||
-          errorObj.message?.includes("token")
-        ) {
+        if (errorObj.response?.status === 401 || errorObj.message?.includes("token")) {
           try {
             // 尝试刷新token
             const refreshSuccess = await refreshToken();

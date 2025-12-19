@@ -1,14 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { profileUpdateSchema } from "@/lib/schemas/auth";
+import { useAuthStore } from "@/lib/store/auth";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { profileUpdateSchema } from "@/lib/schemas/auth";
-import { useAuthStore } from "@/lib/store/auth";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -176,9 +176,7 @@ export default function ProfilePage() {
                   defaultValue={user.email}
                   className={`cursor-pointer ${fieldErrors.email ? "border-red-500" : "border-border"}`}
                 />
-                {fieldErrors.email && (
-                  <p className="text-red-500 text-sm">{fieldErrors.email}</p>
-                )}
+                {fieldErrors.email && <p className="text-red-500 text-sm">{fieldErrors.email}</p>}
               </div>
             </div>
 
@@ -230,9 +228,7 @@ export default function ProfilePage() {
                   defaultValue={user.phone || ""}
                   className={`cursor-pointer ${fieldErrors.phone ? "border-red-500" : "border-border"}`}
                 />
-                {fieldErrors.phone && (
-                  <p className="text-red-500 text-sm">{fieldErrors.phone}</p>
-                )}
+                {fieldErrors.phone && <p className="text-red-500 text-sm">{fieldErrors.phone}</p>}
               </div>
             </div>
 
@@ -248,9 +244,7 @@ export default function ProfilePage() {
                   defaultValue={user.gender || ""}
                   className={`cursor-pointer ${fieldErrors.gender ? "border-red-500" : "border-border"}`}
                 />
-                {fieldErrors.gender && (
-                  <p className="text-red-500 text-sm">{fieldErrors.gender}</p>
-                )}
+                {fieldErrors.gender && <p className="text-red-500 text-sm">{fieldErrors.gender}</p>}
               </div>
             </div>
 
@@ -266,9 +260,7 @@ export default function ProfilePage() {
                   className={`w-full min-h-[100px] p-2 border rounded-md cursor-pointer ${fieldErrors.bio ? "border-red-500" : "border-border"}`}
                   rows={4}
                 />
-                {fieldErrors.bio && (
-                  <p className="text-red-500 text-sm">{fieldErrors.bio}</p>
-                )}
+                {fieldErrors.bio && <p className="text-red-500 text-sm">{fieldErrors.bio}</p>}
               </div>
             </div>
           </div>

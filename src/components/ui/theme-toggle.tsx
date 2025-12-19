@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { Button } from "./button";
 
 export function ThemeToggle() {
@@ -17,11 +17,7 @@ export function ThemeToggle() {
   // 在服务器端渲染时返回一个固定状态，避免hydration mismatch
   if (!mounted) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="cursor-pointer rounded-full"
-      >
+      <Button variant="ghost" size="icon" className="cursor-pointer rounded-full">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"

@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 interface UserPayload {
   user_id: string;
@@ -19,10 +19,7 @@ export const verifyToken = (req: NextRequest): AuthRequest => {
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as UserPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as UserPayload;
     return Object.assign(req, { user: decoded });
   } catch (error) {
     console.error("Token verification failed:", error);
@@ -30,9 +27,7 @@ export const verifyToken = (req: NextRequest): AuthRequest => {
   }
 };
 
-export const withAuth = (
-  handler: (req: AuthRequest) => Promise<NextResponse>
-) => {
+export const withAuth = (handler: (req: AuthRequest) => Promise<NextResponse>) => {
   return async (req: NextRequest) => {
     const authReq = verifyToken(req);
 

@@ -1,6 +1,6 @@
-import { getRequestConfig } from "next-intl/server";
 import { cookies } from "next/headers";
 import { SUPPORTED_LOCALES, type Locale } from "@/lib/constants";
+import { getRequestConfig } from "next-intl/server";
 
 // 服务端获取语言：优先 Cookie，兜底默认语言
 export async function getServerLocale(): Promise<Locale> {

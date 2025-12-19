@@ -19,10 +19,7 @@ export const loginResponseSchema = z.object({
 
 // 个人资料更新请求验证模式
 export const profileUpdateSchema = z.object({
-  username: z
-    .string()
-    .min(1, "用户名不能为空")
-    .max(50, "用户名长度不能超过50个字符"),
+  username: z.string().min(1, "用户名不能为空").max(50, "用户名长度不能超过50个字符"),
   email: z.string().email("请输入有效的邮箱地址"),
   nickname: z.string().max(50, "昵称长度不能超过50个字符").optional(),
   phone: z.string().max(20, "电话号码长度不能超过20个字符").optional(),

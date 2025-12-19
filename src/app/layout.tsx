@@ -1,10 +1,10 @@
+import { Geist, Geist_Mono } from "next/font/google";
+import { getServerLocale } from "@/i18n";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { Geist, Geist_Mono } from "next/font/google";
 import ClientHtml from "@/components/ClientHtml";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { getServerLocale } from "@/i18n";
 import "./globals.css";
 import HeaderWrapper from "./header-wrapper";
 

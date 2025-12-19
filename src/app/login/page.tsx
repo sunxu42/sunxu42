@@ -1,15 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { loginRequestSchema } from "@/lib/schemas/auth";
+import { useAuthStore } from "@/lib/store/auth";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginRequestSchema } from "@/lib/schemas/auth";
-import { useAuthStore } from "@/lib/store/auth";
 
 // 从cookie中获取token
 const getTokenFromCookie = (): string | null => {
@@ -115,11 +115,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            {error && (
-              <div className="p-2 bg-red-100 text-red-700 rounded-md text-sm">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-2 bg-red-100 text-red-700 rounded-md text-sm">{error}</div>}
             <div className="space-y-2">
               <Label htmlFor="email">{t("email")}</Label>
               <Input
@@ -131,9 +127,7 @@ export default function LoginPage() {
                 onChange={e => setEmail(e.target.value)}
                 className={`w-full p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
               />
-              {fieldErrors.email && (
-                <p className="text-red-500 text-sm">{fieldErrors.email}</p>
-              )}
+              {fieldErrors.email && <p className="text-red-500 text-sm">{fieldErrors.email}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("password")}</Label>

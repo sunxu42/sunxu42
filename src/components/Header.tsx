@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { LOCALE_STORAGE_KEY, SUPPORTED_LOCALES } from "@/lib/constants";
 import { useAuthStore } from "@/lib/store/auth";
 import { setCookie } from "cookies-next/client";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "./ui/theme-toggle";
 
@@ -41,9 +41,7 @@ export function Header() {
             size="icon"
             onClick={() => {
               // 循环切换支持的语言
-              const currentIndex = SUPPORTED_LOCALES.indexOf(
-                currentLocale as "en" | "zh"
-              );
+              const currentIndex = SUPPORTED_LOCALES.indexOf(currentLocale as "en" | "zh");
               const nextIndex = (currentIndex + 1) % SUPPORTED_LOCALES.length;
               const newLocale = SUPPORTED_LOCALES[nextIndex];
 

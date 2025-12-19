@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Header } from "@/components/Header";
 import { useTokenRefresh } from "@/lib/hooks/useTokenRefresh";
+import { Header } from "@/components/Header";
 
 export default function HeaderWrapper() {
   const pathname = usePathname();

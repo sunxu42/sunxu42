@@ -23,13 +23,7 @@ const eslintConfig = defineConfig([
       "eol-last": ["error", "always"],
     },
   },
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    ".prettierrc",
-  ]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".prettierrc"]),
 ]);
 
 export default eslintConfig;

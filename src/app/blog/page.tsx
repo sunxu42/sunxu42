@@ -8,8 +8,7 @@ export default function BlogPage() {
     {
       id: 1,
       title: "Next.js 16 新特性详解",
-      summary:
-        "探索 Next.js 16 的最新功能，包括 Turbopack、App Router 改进等。",
+      summary: "探索 Next.js 16 的最新功能，包括 Turbopack、App Router 改进等。",
       date: "2024-12-15",
     },
     {
@@ -35,9 +34,7 @@ export default function BlogPage() {
             <Card key={post.id} className="hover:shadow-md cursor-pointer">
               <CardHeader>
                 <CardTitle className="text-xl">{post.title}</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {post.date}
-                </p>
+                <p className="text-sm text-muted-foreground mt-1">{post.date}</p>
               </CardHeader>
               <CardContent>
                 <p>{post.summary}</p>

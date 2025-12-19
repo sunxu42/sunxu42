@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/authMiddleware";
 import pool from "@/lib/db";
 import { profileUpdateSchema } from "@/lib/schemas/auth";
+import { z } from "zod";
 
 interface AuthRequest extends NextRequest {
   user?: {

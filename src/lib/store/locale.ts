@@ -1,6 +1,6 @@
+import { SUPPORTED_LOCALES, type Locale } from "@/lib/constants";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { SUPPORTED_LOCALES, type Locale } from "@/lib/constants";
 
 interface LocaleState {
   locale: Locale;

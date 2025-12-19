@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
+import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,10 +18,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (tokenResult.rows.length === 0) {
-      return NextResponse.json(
-        { error: "无效的refresh token" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "无效的refresh token" }, { status: 401 });
     }
 
     const tokenData = tokenResult.rows[0];
@@ -31,10 +28,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (user.rows.length === 0) {
-      return NextResponse.json(
-        { error: "用户不存在或已禁用" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "用户不存在或已禁用" }, { status: 401 });
     }
 
     // 生成新的access token
@@ -53,9 +47,7 @@ export async function POST(req: NextRequest) {
     const newRefreshToken = uuidv4();
     const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const clientIp =
-      req.headers.get("x-forwarded-for") ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+      req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
 
     // 撤销旧的refresh token
     await pool.query(

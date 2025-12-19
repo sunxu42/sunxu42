@@ -1,10 +1,10 @@
+import { NextRequest, NextResponse } from "next/server";
+import pool from "@/lib/db";
+import { loginRequestSchema } from "@/lib/schemas/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
-import { loginRequestSchema } from "@/lib/schemas/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,26 +14,21 @@ export async function POST(req: NextRequest) {
     const { email, password } = loginRequestSchema.parse(requestBody);
 
     // 查询用户是否存在
-    const userResult = await pool.query(
-      "SELECT * FROM auth.users WHERE email = $1",
-      [email]
-    );
+    const userResult = await pool.query("SELECT * FROM auth.users WHERE email = $1", [email]);
 
     if (userResult.rows.length > 0) {
       // 用户存在，使用数据库的crypt函数验证密码
       const user = userResult.rows[0];
-      const passwordCheckResult = await pool.query(
-        "SELECT crypt($1, $2) = $2 AS is_valid",
-        [password, user.password_hash]
-      );
+      const passwordCheckResult = await pool.query("SELECT crypt($1, $2) = $2 AS is_valid", [
+        password,
+        user.password_hash,
+      ]);
       const isPasswordValid = passwordCheckResult.rows[0].is_valid;
 
       if (isPasswordValid) {
         // 更新最后登录时间
         const clientIp =
-          req.headers.get("x-forwarded-for") ||
-          req.headers.get("x-real-ip") ||
-          "unknown";
+          req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
         await pool.query(
           "UPDATE auth.users SET last_login_at = NOW(), last_login_ip = $1 WHERE user_id = $2",
           [clientIp, user.user_id]
@@ -63,9 +58,7 @@ export async function POST(req: NextRequest) {
 
         // 生成refresh token
         const refreshToken = uuidv4();
-        const refreshTokenExpiresAt = new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000
-        ); // 7天过期
+        const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7天过期
 
         // 存储refresh token到数据库
         await pool.query(
@@ -137,15 +130,11 @@ export async function POST(req: NextRequest) {
 
       // 生成refresh token
       const refreshToken = uuidv4();
-      const refreshTokenExpiresAt = new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000
-      ); // 7天过期
+      const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7天过期
 
       // 存储refresh token到数据库
       const clientIp =
-        req.headers.get("x-forwarded-for") ||
-        req.headers.get("x-real-ip") ||
-        "unknown";
+        req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
       await pool.query(
         "INSERT INTO auth.refresh_tokens (user_id, token, expires_at, client_info, ip_address) VALUES ($1, $2, $3, $4, $5)",
         [

@@ -9,9 +9,7 @@ export default async function ClientHtml({ children }: ClientHtmlProps) {
   // 从Cookie获取语言偏好，默认中文
   const cookieStore = await cookies();
   const userLocale = cookieStore.get("user-locale")?.value;
-  const locale = SUPPORTED_LOCALES.includes(userLocale as any)
-    ? userLocale
-    : "zh";
+  const locale = SUPPORTED_LOCALES.includes(userLocale as any) ? userLocale : "zh";
 
   return (
     <html
