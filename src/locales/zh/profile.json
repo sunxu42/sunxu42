@@ -6,6 +6,13 @@
   "email": "邮箱",
   "updateButton": "更新资料",
   "updateButtonPending": "更新中...",
+  "cancelButton": "取消",
+  "userId": "用户ID",
+  "username": "用户名",
+  "nickname": "昵称",
+  "phone": "电话号码",
+  "gender": "性别",
+  "bio": "个人简介",
   "success": "个人资料更新成功",
   "error": {
     "nameRequired": "请输入姓名",

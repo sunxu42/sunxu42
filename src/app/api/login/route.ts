@@ -1,9 +1,9 @@
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
-import jwt from "jsonwebtoken";
-import { z } from "zod";
 import { loginRequestSchema } from "@/lib/schemas/auth";
 
 export async function POST(req: NextRequest) {
@@ -20,13 +20,13 @@ export async function POST(req: NextRequest) {
     );
 
     if (userResult.rows.length > 0) {
-        // 用户存在，使用数据库的crypt函数验证密码
-        const user = userResult.rows[0];
-        const passwordCheckResult = await pool.query(
-          "SELECT crypt($1, $2) = $2 AS is_valid",
-          [password, user.password_hash]
-        );
-        const isPasswordValid = passwordCheckResult.rows[0].is_valid;
+      // 用户存在，使用数据库的crypt函数验证密码
+      const user = userResult.rows[0];
+      const passwordCheckResult = await pool.query(
+        "SELECT crypt($1, $2) = $2 AS is_valid",
+        [password, user.password_hash]
+      );
+      const isPasswordValid = passwordCheckResult.rows[0].is_valid;
 
       if (isPasswordValid) {
         // 更新最后登录时间
@@ -103,16 +103,16 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // 用户不存在，创建新用户
-        const userId = uuidv4();
-        const username = email.split("@")[0]; // 使用邮箱前缀作为默认用户名
+      const userId = uuidv4();
+      const username = email.split("@")[0]; // 使用邮箱前缀作为默认用户名
 
-        await pool.query(
-          `INSERT INTO auth.users (
+      await pool.query(
+        `INSERT INTO auth.users (
             user_id, username, email, password_hash, status, 
             created_at, updated_at, last_login_at, last_login_ip
           ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), NOW(), $6)`,
-          [userId, username, email, password, "active", "unknown"]
-        );
+        [userId, username, email, password, "active", "unknown"]
+      );
 
       // 生成JWT token
       const token = jwt.sign(

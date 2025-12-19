@@ -1,17 +1,25 @@
-'use client';
-
-import { useLocaleStore } from '@/lib/store/locale';
+import { cookies } from "next/headers";
+import { SUPPORTED_LOCALES } from "@/lib/constants";
 
 interface ClientHtmlProps {
   children: React.ReactNode;
 }
 
-export default function ClientHtml({ children }: ClientHtmlProps) {
-  // 直接使用Zustand store中的locale值
-  const { locale } = useLocaleStore();
+export default async function ClientHtml({ children }: ClientHtmlProps) {
+  // 从Cookie获取语言偏好，默认中文
+  const cookieStore = await cookies();
+  const userLocale = cookieStore.get("user-locale")?.value;
+  const locale = SUPPORTED_LOCALES.includes(userLocale as any)
+    ? userLocale
+    : "zh";
 
   return (
-    <html lang={locale} className="scroll-smooth" data-scroll-behavior="smooth">
+    <html
+      lang={locale}
+      className={"scroll-smooth"}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       {children}
     </html>
   );

@@ -1,13 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/lib/store/auth";
-import { useRouter } from "next/navigation";
 import { profileUpdateSchema } from "@/lib/schemas/auth";
-import { useTranslations } from 'next-intl';
+import { useAuthStore } from "@/lib/store/auth";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -119,7 +120,7 @@ export default function ProfilePage() {
 
     return (
       <Button type="submit" disabled={pending} className="cursor-pointer">
-        {pending ? t('updateButtonPending') : t('updateButton')}
+        {pending ? t("updateButtonPending") : t("updateButton")}
       </Button>
     );
   }
@@ -131,115 +132,144 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="min-w-[280px] md:min-w-[600px] max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">{t('title')}</h1>
+        <h1 className="text-3xl font-bold mb-6">{t("title")}</h1>
 
-        <form action={handleUpdateProfile} className="space-y-6 p-6 bg-white">
+        <form
+          action={handleUpdateProfile}
+          className="space-y-6 p-6 bg-background border border-border rounded-lg shadow-sm"
+        >
           {successMessage && (
-            <div className="p-3 bg-green-100 text-green-800 rounded-md text-sm">
-              {t('success')}
+            <div className="p-3 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-md text-sm">
+              {t("success")}
             </div>
           )}
 
           {errorMessage && (
-            <div className="p-3 bg-red-100 text-red-800 rounded-md text-sm">
+            <div className="p-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 rounded-md text-sm">
               {errorMessage}
             </div>
           )}
 
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="user_id">User ID</Label>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
+              <Label htmlFor="user_id" className="lg:pr-4 text-right">
+                {t("userId")}
+              </Label>
               <Input
                 id="user_id"
                 type="text"
                 value={user.user_id}
                 disabled
-                className="bg-gray-50 cursor-not-allowed"
+                className="bg-muted cursor-not-allowed lg:col-span-2"
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="email">{t('email')}</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                defaultValue={user.email}
-                className={`cursor-pointer ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
-              />
-              {fieldErrors.email && (
-                <p className="text-red-500 text-sm">{fieldErrors.email}</p>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
+              <Label htmlFor="email" className="lg:pr-4 text-right">
+                {t("email")}
+              </Label>
+              <div className="lg:col-span-2">
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  defaultValue={user.email}
+                  className={`cursor-pointer ${fieldErrors.email ? "border-red-500" : "border-border"}`}
+                />
+                {fieldErrors.email && (
+                  <p className="text-red-500 text-sm">{fieldErrors.email}</p>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="username">用户名</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                defaultValue={user.username}
-                className={`cursor-pointer ${fieldErrors.username ? "border-red-500" : "border-gray-300"}`}
-              />
-              {fieldErrors.username && (
-                <p className="text-red-500 text-sm">{fieldErrors.username}</p>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
+              <Label htmlFor="username" className="lg:pr-4 text-right">
+                {t("username")}
+              </Label>
+              <div className="lg:col-span-2">
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  defaultValue={user.username}
+                  className={`cursor-pointer ${fieldErrors.username ? "border-red-500" : "border-border"}`}
+                />
+                {fieldErrors.username && (
+                  <p className="text-red-500 text-sm">{fieldErrors.username}</p>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="nickname">昵称</Label>
-              <Input
-                id="nickname"
-                name="nickname"
-                type="text"
-                defaultValue={user.nickname || ""}
-                className={`cursor-pointer ${fieldErrors.nickname ? "border-red-500" : "border-gray-300"}`}
-              />
-              {fieldErrors.nickname && (
-                <p className="text-red-500 text-sm">{fieldErrors.nickname}</p>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
+              <Label htmlFor="nickname" className="lg:pr-4 text-right">
+                {t("nickname")}
+              </Label>
+              <div className="lg:col-span-2">
+                <Input
+                  id="nickname"
+                  name="nickname"
+                  type="text"
+                  defaultValue={user.nickname || ""}
+                  className={`cursor-pointer ${fieldErrors.nickname ? "border-red-500" : "border-border"}`}
+                />
+                {fieldErrors.nickname && (
+                  <p className="text-red-500 text-sm">{fieldErrors.nickname}</p>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="phone">电话号码</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="text"
-                defaultValue={user.phone || ""}
-                className={`cursor-pointer ${fieldErrors.phone ? "border-red-500" : "border-gray-300"}`}
-              />
-              {fieldErrors.phone && (
-                <p className="text-red-500 text-sm">{fieldErrors.phone}</p>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
+              <Label htmlFor="phone" className="lg:pr-4 text-right">
+                {t("phone")}
+              </Label>
+              <div className="lg:col-span-2">
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  defaultValue={user.phone || ""}
+                  className={`cursor-pointer ${fieldErrors.phone ? "border-red-500" : "border-border"}`}
+                />
+                {fieldErrors.phone && (
+                  <p className="text-red-500 text-sm">{fieldErrors.phone}</p>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="gender">性别</Label>
-              <Input
-                id="gender"
-                name="gender"
-                type="text"
-                defaultValue={user.gender || ""}
-                className={`cursor-pointer ${fieldErrors.gender ? "border-red-500" : "border-gray-300"}`}
-              />
-              {fieldErrors.gender && (
-                <p className="text-red-500 text-sm">{fieldErrors.gender}</p>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-center">
+              <Label htmlFor="gender" className="lg:pr-4 text-right">
+                {t("gender")}
+              </Label>
+              <div className="lg:col-span-2">
+                <Input
+                  id="gender"
+                  name="gender"
+                  type="text"
+                  defaultValue={user.gender || ""}
+                  className={`cursor-pointer ${fieldErrors.gender ? "border-red-500" : "border-border"}`}
+                />
+                {fieldErrors.gender && (
+                  <p className="text-red-500 text-sm">{fieldErrors.gender}</p>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="bio">个人简介</Label>
-              <textarea
-                id="bio"
-                name="bio"
-                defaultValue={user.bio || ""}
-                className={`w-full min-h-[100px] p-2 border rounded-md cursor-pointer ${fieldErrors.bio ? "border-red-500" : "border-gray-300"}`}
-                rows={4}
-              />
-              {fieldErrors.bio && (
-                <p className="text-red-500 text-sm">{fieldErrors.bio}</p>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
+              <Label htmlFor="bio" className="lg:pr-4 text-right pt-2">
+                {t("bio")}
+              </Label>
+              <div className="lg:col-span-2">
+                <textarea
+                  id="bio"
+                  name="bio"
+                  defaultValue={user.bio || ""}
+                  className={`w-full min-h-[100px] p-2 border rounded-md cursor-pointer ${fieldErrors.bio ? "border-red-500" : "border-border"}`}
+                  rows={4}
+                />
+                {fieldErrors.bio && (
+                  <p className="text-red-500 text-sm">{fieldErrors.bio}</p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -250,7 +280,7 @@ export default function ProfilePage() {
               onClick={() => router.push("/")}
               className="cursor-pointer"
             >
-              Cancel
+              {t("cancelButton")}
             </Button>
             <SubmitButton />
           </div>

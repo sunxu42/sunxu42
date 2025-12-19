@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
 import createNextIntlPlugin from "next-intl/plugin";
+import withPWA from "next-pwa";
 
-const nextIntlPlugin = createNextIntlPlugin(
-  './src/i18n.ts'
-);
+const nextIntlPlugin = createNextIntlPlugin("./src/i18n.ts");
 
 const pwaOptions = {
   dest: "public",
@@ -21,4 +19,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextIntlPlugin(withPWA(pwaOptions)(nextConfig));
-

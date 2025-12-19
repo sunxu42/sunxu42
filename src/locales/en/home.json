@@ -17,5 +17,10 @@
   },
   "recentActivities": "Recent Activities",
   "noActivities": "No recent activities",
-  "viewAll": "View All"
+  "viewAll": "View All",
+  "about": "About Us",
+  "blog": {
+    "title": "My Blog",
+    "link": "Blog"
+  }
 }

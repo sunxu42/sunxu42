@@ -1,6 +1,8 @@
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function BlogPage() {
+  const t = useTranslations();
   // 示例博客文章数据
   const posts = [
     {
@@ -27,13 +29,10 @@ export default function BlogPage() {
   return (
     <div className="py-10 px-4 sm:px-6 lg:px-8">
       <div className="min-w-[280px] md:min-w-[600px] max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">我的博客</h1>
+        <h1 className="text-3xl font-bold mb-8">{t("blog.title")}</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {posts.map(post => (
-            <Card
-              key={post.id}
-              className="hover:shadow-md cursor-pointer"
-            >
+            <Card key={post.id} className="hover:shadow-md cursor-pointer">
               <CardHeader>
                 <CardTitle className="text-xl">{post.title}</CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">

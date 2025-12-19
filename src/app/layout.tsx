@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { Geist, Geist_Mono } from "next/font/google";
+import ClientHtml from "@/components/ClientHtml";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { getServerLocale } from "@/i18n";
 import "./globals.css";
 import HeaderWrapper from "./header-wrapper";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import ClientHtml from '@/components/ClientHtml';
-import { cookies } from 'next/headers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,12 +35,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 从Cookie获取语言偏好，默认中文
-  const cookieStore = await cookies();
-  const userLocale = cookieStore.get('user-locale')?.value;
-  const locale = ['en', 'zh'].includes(userLocale as any) ? userLocale : 'zh';
-  
-  // 加载对应语言的翻译文案
+  const locale = await getServerLocale();
   const messages = await getMessages({ locale });
 
   return (
@@ -47,12 +43,21 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-background text-foreground`}
       >
-        <NextIntlClientProvider messages={messages}>
-          <HeaderWrapper />
-          <main className="w-full flex justify-center px-4 sm:px-6">
-            {children}
-          </main>
-        </NextIntlClientProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          themes={["light", "dark"]}
+          disableTransitionOnChange={true}
+          storageKey="my-custom-theme"
+        >
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <HeaderWrapper />
+            <main className="w-full max-w-7xl mx-auto flex justify-center px-4 sm:px-6">
+              {children}
+            </main>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </ClientHtml>
   );

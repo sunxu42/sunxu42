@@ -9,5 +9,7 @@
   "settings": "设置",
   "logout": "退出登录",
   "noActivity": "暂无活动记录",
-  "loading": "加载中..."
+  "loading": "加载中...",
+  "about": "关于我们",
+  "blog": "博客"
 }

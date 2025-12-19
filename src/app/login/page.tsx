@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/lib/store/auth";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
 import { loginRequestSchema } from "@/lib/schemas/auth";
-import { useTranslations } from 'next-intl';
+import { useAuthStore } from "@/lib/store/auth";
 
 // 从cookie中获取token
 const getTokenFromCookie = (): string | null => {
@@ -111,7 +111,7 @@ export default function LoginPage() {
     <div className="min-w-[280px] md:min-w-[480px] max-w-[480px] flex min-h-screen items-center justify-center p-4">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">{t('title')}</CardTitle>
+          <CardTitle className="text-2xl">{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -121,14 +121,14 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">{t('email')}</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder={t('email')}
+                placeholder={t("email")}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 className={`w-full p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.email ? "border-red-500" : "border-gray-300"}`}
               />
               {fieldErrors.email && (
@@ -136,25 +136,22 @@ export default function LoginPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">{t('password')}</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
-                placeholder={t('password')}
+                placeholder={t("password")}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.password ? "border-red-500" : "border-gray-300"}`}
               />
               {fieldErrors.password && (
                 <p className="text-red-500 text-sm">{fieldErrors.password}</p>
               )}
             </div>
-            <Button
-              type="submit"
-              className="w-full cursor-pointer"
-            >
-              {t('loginButton')}
+            <Button type="submit" className="w-full cursor-pointer">
+              {t("loginButton")}
             </Button>
           </form>
         </CardContent>

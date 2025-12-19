@@ -6,6 +6,13 @@
   "email": "Email",
   "updateButton": "Update Profile",
   "updateButtonPending": "Updating...",
+  "cancelButton": "Cancel",
+  "userId": "User ID",
+  "username": "Username",
+  "nickname": "Nickname",
+  "phone": "Phone Number",
+  "gender": "Gender",
+  "bio": "Bio",
   "success": "Profile updated successfully",
   "error": {
     "nameRequired": "Name is required",

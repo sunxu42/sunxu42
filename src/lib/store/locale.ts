@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-
-type Locale = "en" | "zh";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { SUPPORTED_LOCALES, type Locale } from "@/lib/constants";
 
 interface LocaleState {
   locale: Locale;
@@ -25,7 +24,7 @@ export const useLocaleStore = create<LocaleState>()(
         set({ locale });
         // 同步更新Cookie
         if (typeof window !== "undefined") {
-          document.cookie = `user-locale=${locale}; path=/; max-age=31536000; ${process.env.NODE_ENV === 'production' ? 'secure;' : ''} sameSite=lax`;
+          document.cookie = `user-locale=${locale}; path=/; max-age=31536000; ${process.env.NODE_ENV === "production" ? "secure;" : ""} sameSite=lax`;
         }
       },
     }),
@@ -33,9 +32,9 @@ export const useLocaleStore = create<LocaleState>()(
       name: "locale-storage", // 本地存储的键名
       storage: createJSONStorage(() => localStorage), // 使用localStorage进行存储
       // 在首次加载时，如果没有存储的语言，则使用浏览器语言
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         if (typeof window === "undefined" || state !== undefined) return;
-        
+
         // 只有当state为undefined（即首次加载且没有存储的语言）时，才使用浏览器语言
         const browserLocale = getBrowserLocale();
         useLocaleStore.getState().setLocale(browserLocale);

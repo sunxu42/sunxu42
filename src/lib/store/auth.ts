@@ -1,7 +1,8 @@
 "use client";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+
 import { z } from "zod";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 // User Zod Schema
 export const userSchema = z.object({
@@ -101,9 +102,9 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         // 清除cookie中的token和refresh token
         if (typeof window !== "undefined") {
-          document.cookie = 
+          document.cookie =
             "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          document.cookie = 
+          document.cookie =
             "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         }
         set({ user: null, isLoggedIn: false });
@@ -156,7 +157,7 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
       // 在状态恢复后检查认证状态
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         // 只在客户端检查认证状态
         if (typeof window !== "undefined") {
           // 无论是否有存储的状态，都检查当前token的有效性

@@ -1,18 +1,17 @@
 "use client";
+
+import { LOCALE_STORAGE_KEY, SUPPORTED_LOCALES } from "@/lib/constants";
+import { useAuthStore } from "@/lib/store/auth";
+import { setCookie } from "cookies-next/client";
+import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "./ui/theme-toggle";
-import Link from "next/link";
-import { useAuthStore } from "@/lib/store/auth";
-import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { useLocaleStore } from "@/lib/store/locale";
 
 export function Header() {
   const { isLoggedIn, user, logout } = useAuthStore();
   const t = useTranslations();
   const currentLocale = useLocale();
-  const router = useRouter();
-  const { setLocale } = useLocaleStore();
 
   const handleLogout = () => {
     logout();
@@ -25,7 +24,10 @@ export function Header() {
         {/* 应用名称 */}
         <div className="flex items-center gap-2">
           <div className="text-xl font-bold tracking-tight text-primary">
-            <Link href="/" className="cursor-pointer flex items-center gap-2 hover:text-primary/90 hover:scale-105 theme-toggle-transition">
+            <Link
+              href="/"
+              className="cursor-pointer flex items-center gap-2 hover:text-primary/90 hover:scale-105 theme-toggle-transition"
+            >
               <span>sunxu42</span>
             </Link>
           </div>
@@ -38,17 +40,30 @@ export function Header() {
             variant="ghost"
             size="icon"
             onClick={() => {
-              const newLocale = currentLocale === 'en' ? 'zh' : 'en';
-              // 更新Zustand store（会自动同步到localStorage和Cookie）
-              setLocale(newLocale);
-              // 刷新页面以确保所有组件都使用新的语言
-              router.refresh();
+              // 循环切换支持的语言
+              const currentIndex = SUPPORTED_LOCALES.indexOf(
+                currentLocale as "en" | "zh"
+              );
+              const nextIndex = (currentIndex + 1) % SUPPORTED_LOCALES.length;
+              const newLocale = SUPPORTED_LOCALES[nextIndex];
+
+              // 1. 更新 localStorage（核心：用户侧缓存，体验好）
+              localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+              // 2. 更新 Cookie（兜底：服务端能读取，解决水合问题）
+              setCookie(LOCALE_STORAGE_KEY, newLocale, {
+                path: "/",
+                maxAge: 365 * 24 * 60 * 60,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+              });
+              // 3. 刷新页面以加载新语言
+              window.location.reload();
             }}
             className="cursor-pointer rounded-full"
           >
             <span className="font-medium">{currentLocale.toUpperCase()}</span>
           </Button>
-          
+
           {/* 主题切换按钮 */}
           <div className="hover:scale-105">
             <ThemeToggle />
@@ -81,7 +96,7 @@ export function Header() {
                 size="sm"
                 className="cursor-pointer rounded-full transition-transform duration-200 hover:scale-105"
               >
-                {t('login')}
+                {t("login")}
               </Button>
             </Link>
           )}

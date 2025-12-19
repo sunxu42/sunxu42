@@ -1,28 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { Button } from "./button";
-import { useThemeStore } from "@/lib/store/theme";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useThemeStore();
+  const { theme, setTheme } = useTheme();
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
   const [mounted, setMounted] = useState(false);
 
-  // 确保只在客户端渲染时访问主题状态
+  // 确保只在客户端渲染完成后才访问主题状态
   useEffect(() => {
     setMounted(true);
   }, []);
 
-
-
-  // 在服务器端渲染时返回一个固定的内容，避免水合不匹配
+  // 在服务器端渲染时返回一个固定状态，避免hydration mismatch
   if (!mounted) {
     return (
       <Button
         variant="ghost"
         size="icon"
         className="cursor-pointer rounded-full"
-        onClick={toggleTheme}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
