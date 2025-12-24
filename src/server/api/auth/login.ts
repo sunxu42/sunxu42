@@ -109,6 +109,8 @@ export async function login(
         email: true,
         username: true,
         password_hash: true,
+        created_at: true,
+        updated_at: true,
         profile: {
           select: {
             nickname: true,
@@ -155,14 +157,24 @@ export async function login(
 
         // 返回登录响应数据
         return {
-          token,
-          refresh_token: refreshToken,
-          expires_in: expiresIn,
-          user: {
-            user_id: user.user_id,
-            email: user.email,
-            username: user.username || email.split("@")[0],
-            nickname: nickname,
+          code: 200,
+          message: "登录成功",
+          success: true,
+          data: {
+            token,
+            refresh_token: refreshToken,
+            expires_in: expiresIn,
+            user: {
+              user_id: user.user_id,
+              email: user.email,
+              status: "active",
+              username: user.username || email.split("@")[0],
+              created_at: user.created_at,
+              profile: {
+                ...user.profile,
+                nickname,
+              },
+            },
           },
         };
       } else {
@@ -199,6 +211,8 @@ export async function login(
             user_id: true,
             email: true,
             username: true,
+            created_at: true,
+            updated_at: true,
           },
         });
 
@@ -224,14 +238,23 @@ export async function login(
 
       // 返回登录响应数据
       return {
-        token,
-        refresh_token: refreshToken,
-        expires_in: expiresIn,
-        user: {
-          user_id: newUser.user_id,
-          email: newUser.email,
-          username: newUser.username || email.split("@")[0],
-          nickname,
+        code: 200,
+        message: "登录成功",
+        success: true,
+        data: {
+          token,
+          refresh_token: refreshToken,
+          expires_in: expiresIn,
+          user: {
+            user_id: newUser.user_id,
+            email: newUser.email,
+            status: "active",
+            username: newUser.username || email.split("@")[0],
+            created_at: newUser.created_at,
+            profile: {
+              nickname,
+            },
+          },
         },
       };
     }

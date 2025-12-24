@@ -10,19 +10,17 @@ export enum ErrorCode {
 }
 
 // API响应类型的zod模式
-export const ApiResponseSchema = z.object({
-  code: z.enum(ErrorCode),
-  message: z.string(),
-  success: z.boolean(),
-  data: z.unknown(),
-});
-
-// 泛型 API 响应校验规则
 export function createApiResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
-  return ApiResponseSchema.extend({
+  return z.object({
+    code: z.enum(ErrorCode),
+    message: z.string(),
+    success: z.boolean(),
     data: dataSchema,
   });
 }
+
+// 保持向后兼容的默认版本
+export const ApiResponseSchema = createApiResponseSchema(z.unknown());
 
 // 分页参数的zod模式
 export const PaginationParamsSchema = z.object({
@@ -43,18 +41,27 @@ export const PaginationMetaSchema = z.object({
 });
 
 // 分页响应的zod模式
-export const PaginatedResponseSchema = z.object({
-  success: z.literal(true),
-  message: z.string().optional(),
-  data: z.array(z.any()),
-  meta: PaginationMetaSchema,
-});
+export function createPaginatedResponseSchema<T extends z.ZodTypeAny>(itemSchema: T) {
+  return z.object({
+    success: z.literal(true),
+    message: z.string().optional(),
+    data: z.array(itemSchema),
+    meta: PaginationMetaSchema,
+  });
+}
+
+// 保持向后兼容的默认版本
+export const PaginatedResponseSchema = createPaginatedResponseSchema(z.any());
 
 // 从zod模式导出TypeScript类型
-export type ApiResponse<T> = z.infer<typeof ApiResponseSchema> & { data?: T };
+export type ApiResponse<T> = z.infer<ReturnType<typeof createApiResponseSchema<z.ZodTypeAny>>> & {
+  data: T;
+};
 export type PaginationParams = z.infer<typeof PaginationParamsSchema>;
 export type PaginationMeta = z.infer<typeof PaginationMetaSchema>;
-export type PaginatedResponse<T> = z.infer<typeof PaginatedResponseSchema> & { data: T[] };
+export type PaginatedResponse<T> = z.infer<
+  ReturnType<typeof createPaginatedResponseSchema<z.ZodTypeAny>>
+> & { data: T[] };
 
 // API错误响应验证模式
 export const ApiErrorResponseSchema = z.object({

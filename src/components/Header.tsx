@@ -83,10 +83,10 @@ export function Header() {
                 // 登录状态显示用户头像
                 <div className="flex items-center gap-2">
                   <Link href="/profile" className="cursor-pointer">
-                    {user?.photo ? (
+                    {user?.profile?.avatar_url ? (
                       // 如果有头像图片，显示图片
                       <Image
-                        src={user.photo}
+                        src={user.profile?.avatar_url || "/default-avatar.png"}
                         alt={`${user.username}的头像`}
                         width={36}
                         height={36}

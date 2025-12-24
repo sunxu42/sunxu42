@@ -1,51 +1,22 @@
 "use client";
 
+// 使用新的类型体系
+import { createApiResponseSchema } from "@/types/api-schemas";
+import { RefreshTokenResponseSchema } from "@/types/auth-schemas";
+import { ApiUserSchema } from "@/types/common";
 import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-// User Zod Schema
-export const userSchema = z.object({
-  user_id: z.string(),
-  email: z.email(),
-  username: z.string(),
-  nickname: z.string().optional(),
-  avatar_url: z.string().optional(),
-  phone: z.string().optional(),
-  gender: z.string().optional(),
-  bio: z.string().optional(),
-  photo: z.string().optional(),
-});
-
-// User Type inferred from Zod Schema
-export type User = z.infer<typeof userSchema>;
-
-// Refresh Token Response Zod Schema
-const refreshTokenResponseSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-  data: z.object({
-    token: z.string(),
-    refresh_token: z.string(),
-    expires_in: z.number(),
-    user: userSchema,
-  }),
-});
+// 使用新的ApiUserSchema，它已经包含了所有需要的字段和null值处理
+export type User = z.infer<typeof ApiUserSchema>;
 
 // Profile API Response Zod Schema
-const profileResponseSchema = z.object({
-  success: z.boolean(),
-  data: z.object({
-    user: userSchema,
-  }),
-});
-
-// AuthState Zod Schema (for state properties validation)
-export const authStateSchema = z.object({
-  user: userSchema.nullable(),
-  isLoggedIn: z.boolean(),
-  isRefreshing: z.boolean(),
-});
+const profileResponseSchema = createApiResponseSchema(
+  z.object({
+    user: ApiUserSchema,
+  })
+);
 
 // AuthState interface
 interface AuthState {
@@ -137,7 +108,7 @@ export const useAuthStore = create<AuthState>()(
           if (response.ok) {
             const data = await response.json();
             // Validate response data with Zod
-            const validatedData = refreshTokenResponseSchema.parse(data);
+            const validatedData = RefreshTokenResponseSchema.parse(data);
             set({ user: validatedData.data.user, isLoggedIn: true });
             return true;
           } else {

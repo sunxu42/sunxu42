@@ -1,25 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/store/auth";
-import { LoginApiResponseSchema, LoginRequestSchema } from "@/types/auth-schemas";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signIn } from "next-auth/react";
 
-// 从cookie中获取token
-const getTokenFromCookie = (): string | null => {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(^|;)\s*token\s*=\s*([^;]+)/);
-  return match ? match[2] : null;
-};
+// 用户登录验证schema
+const loginSchema = z.object({
+  email: z.string().email("邮箱格式不正确"),
+  password: z.string().min(6, "密码长度不能少于6位"),
+});
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{
@@ -27,38 +26,13 @@ export default function LoginPage() {
     password?: string;
   }>({});
   const [error, setError] = useState("");
-  const login = useAuthStore(state => state.login);
   const t = useTranslations();
 
-  // 检查是否有token，如果有则跳转到home页面
-  useEffect(() => {
-    const checkAuth = async () => {
-      // 首先检查cookie
-      const token = getTokenFromCookie();
-      if (token) {
-        router.push("/home");
-        return;
-      }
-
-      // 然后检查auth store
-      const isLoggedIn = useAuthStore.getState().isLoggedIn;
-      if (isLoggedIn) {
-        router.push("/home");
-        return;
-      }
-
-      // 最后尝试检查auth状态（处理异步初始化的情况）
-      await useAuthStore.getState().checkAuthStatus();
-
-      // 再次检查登录状态
-      const updatedIsLoggedIn = useAuthStore.getState().isLoggedIn;
-      if (updatedIsLoggedIn) {
-        router.push("/home");
-      }
-    };
-
-    checkAuth();
-  }, [router]);
+  // 检查URL中的错误参数
+  const errorParam = searchParams.get("error");
+  if (errorParam && !error) {
+    setError(errorParam === "CredentialsSignin" ? "邮箱或密码错误" : "登录失败，请重试");
+  }
 
   // 表单提交处理函数
   const handleLogin = async (e: React.FormEvent) => {
@@ -68,49 +42,33 @@ export default function LoginPage() {
 
     try {
       // 客户端验证表单数据
-      LoginRequestSchema.parse({ email, password });
+      loginSchema.parse({ email, password });
 
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      // 使用next-auth的signIn函数
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
       });
 
-      const data = await response.json();
-
-      // 使用Zod验证API响应
-      const validatedResponse = LoginApiResponseSchema.parse(data);
-
-      if (validatedResponse.success) {
-        // 登录成功，使用auth store保存用户信息
-        login(validatedResponse.data.user);
-
-        // 跳转到首页
-        router.push("/home");
+      if (result?.error) {
+        setError("邮箱或密码错误");
       } else {
-        // 处理API返回的错误
-        setError(validatedResponse.details || validatedResponse.error);
+        // 登录成功，跳转到首页
+        router.push("/home");
       }
     } catch (err: unknown) {
       if (err instanceof z.ZodError) {
         // 处理zod验证错误
-        if (err.issues.some(issue => issue.path.includes("data"))) {
-          // 响应验证错误
-          setError("服务器返回的数据格式不正确");
-        } else {
-          // 表单验证错误
-          const errors: { email?: string; password?: string } = {};
-          err.issues.forEach((error: z.ZodIssue) => {
-            if (error.path[0] === "email") {
-              errors.email = error.message;
-            } else if (error.path[0] === "password") {
-              errors.password = error.message;
-            }
-          });
-          setFieldErrors(errors);
-        }
+        const errors: { email?: string; password?: string } = {};
+        err.issues.forEach((error: z.ZodIssue) => {
+          if (error.path[0] === "email") {
+            errors.email = error.message;
+          } else if (error.path[0] === "password") {
+            errors.password = error.message;
+          }
+        });
+        setFieldErrors(errors);
       } else {
         setError(err instanceof Error ? err.message : "发生未知错误");
       }

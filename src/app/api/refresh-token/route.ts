@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { handleApiError } from "@/lib/utils";
 import { refreshToken } from "@/server/api/auth/refreshToken";
 import { ErrorCode, type ApiResponse } from "@/types/index";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 // 辅助函数：设置认证cookies
 function setAuthCookies(response: NextResponse, token: string, refreshToken: string) {
@@ -63,62 +63,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: unknown) {
-    // 处理Prisma特定错误
-    if (error instanceof PrismaClientKnownRequestError) {
-      console.error("Prisma错误:", error);
-      console.error("错误代码:", error.code);
-      console.error("错误元数据:", error.meta);
-
-      // 根据错误代码返回不同的错误信息
-      switch (error.code) {
-        case "P2025":
-          // 记录未找到
-          return NextResponse.json(
-            {
-              success: false,
-              error: "无效的refresh token",
-              code: ErrorCode.UNAUTHORIZED,
-            },
-            { status: 401 }
-          );
-        default:
-          // 其他Prisma错误
-          return NextResponse.json(
-            {
-              success: false,
-              error: "数据库操作失败",
-              details: error.message,
-              code: ErrorCode.SERVER_ERROR,
-            },
-            { status: 500 }
-          );
-      }
-    }
-
-    console.error("Refresh token错误:", error);
-
-    // 处理特定错误信息
-    if (error instanceof Error) {
-      if (error.message === "无效的refresh token" || error.message === "用户不存在或已禁用") {
-        return NextResponse.json(
-          {
-            success: false,
-            error: error.message,
-            code: ErrorCode.UNAUTHORIZED,
-          },
-          { status: 401 }
-        );
-      }
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "服务器内部错误",
-        details: error instanceof Error ? error.message : String(error),
-        code: ErrorCode.SERVER_ERROR,
-      },
-      { status: 500 }
-    );
+    return handleApiError(error, "刷新令牌");
   }
 }

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { handleApiError } from "@/lib/utils";
 import { login } from "@/server/api/auth/login";
 import { ErrorCode, LoginRequestSchema, LoginResponse, type ApiResponse } from "@/types/index";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { z } from "zod";
 
 // 辅助函数：设置认证cookies
 function setAuthCookies(response: NextResponse, token: string, refreshToken: string) {
@@ -52,91 +51,10 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json(successResponse, { status: 200 });
 
     // 设置token和refresh token到cookie
-    setAuthCookies(response, loginResponse.token, loginResponse.refresh_token);
+    setAuthCookies(response, loginResponse.data.token, loginResponse.data.refresh_token);
 
     return response;
   } catch (error: unknown) {
-    // 处理zod验证错误
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "请求数据验证失败",
-          details: error.issues.map((e: z.ZodIssue) => e.message).join(", "),
-          code: ErrorCode.PARAM_ERROR,
-        },
-        { status: 400 }
-      );
-    }
-
-    // 处理Prisma特定错误
-    if (error instanceof PrismaClientKnownRequestError) {
-      console.error("Prisma错误:", error);
-      console.error("错误代码:", error.code);
-      console.error("错误元数据:", error.meta);
-
-      // 根据错误代码返回不同的错误信息
-      switch (error.code) {
-        case "P2002":
-          // 唯一约束冲突
-          const field = error.meta?.target as string;
-          return NextResponse.json(
-            {
-              success: false,
-              error: field ? `${field}已被占用` : "数据冲突",
-              code: ErrorCode.USER_ALREADY_EXISTS,
-            },
-            { status: 409 }
-          );
-        case "P2025":
-          // 记录未找到
-          return NextResponse.json(
-            {
-              success: false,
-              error: "用户不存在",
-              code: ErrorCode.NOT_FOUND,
-            },
-            { status: 404 }
-          );
-        default:
-          // 其他Prisma错误
-          return NextResponse.json(
-            {
-              success: false,
-              error: "数据库操作失败",
-              details: error.message,
-              code: ErrorCode.SERVER_ERROR,
-            },
-            { status: 500 }
-          );
-      }
-    }
-
-    console.error("登录错误:", error);
-    if (error instanceof Error) {
-      console.error("错误详情:", error.message);
-    }
-
-    // 处理密码错误
-    if (error instanceof Error && error.message === "密码错误") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "密码错误",
-          code: ErrorCode.UNAUTHORIZED,
-        },
-        { status: 401 }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "服务器内部错误",
-        details: error instanceof Error ? error.message : String(error),
-        code: ErrorCode.SERVER_ERROR,
-      },
-      { status: 500 }
-    );
+    return handleApiError(error, "登录");
   }
 }
