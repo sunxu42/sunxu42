@@ -1,99 +1,124 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
-import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
+import { refreshToken } from "@/server/api/auth/refreshToken";
+import { ErrorCode, type ApiResponse } from "@/types/index";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+
+// 辅助函数：设置认证cookies
+function setAuthCookies(response: NextResponse, token: string, refreshToken: string) {
+  response.cookies.set("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 4 * 60 * 60, // 4小时
+  });
+
+  response.cookies.set("refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60, // 7天
+  });
+
+  return response;
+}
 
 export async function POST(req: NextRequest) {
   try {
     // 从cookie获取refresh token
-    const refreshToken = req.cookies.get("refresh_token")?.value;
-    if (!refreshToken) {
-      return NextResponse.json({ error: "缺少refresh token" }, { status: 401 });
+    const refreshTokenValue = req.cookies.get("refresh_token")?.value;
+    if (!refreshTokenValue) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "缺少refresh token",
+          code: ErrorCode.UNAUTHORIZED,
+        },
+        { status: 401 }
+      );
     }
 
-    // 验证refresh token
-    const tokenResult = await pool.query(
-      "SELECT * FROM auth.refresh_tokens WHERE token = $1 AND is_revoked = false AND expires_at > NOW()",
-      [refreshToken]
-    );
-
-    if (tokenResult.rows.length === 0) {
-      return NextResponse.json({ error: "无效的refresh token" }, { status: 401 });
-    }
-
-    const tokenData = tokenResult.rows[0];
-    const user = await pool.query(
-      "SELECT user_id, email, username FROM auth.users WHERE user_id = $1 AND status = 'active'",
-      [tokenData.user_id]
-    );
-
-    if (user.rows.length === 0) {
-      return NextResponse.json({ error: "用户不存在或已禁用" }, { status: 401 });
-    }
-
-    // 生成新的access token
-    const secretKey = process.env.JWT_SECRET as string;
-    const newAccessToken = jwt.sign(
-      {
-        user_id: user.rows[0].user_id,
-        email: user.rows[0].email,
-        username: user.rows[0].username,
-      },
-      secretKey,
-      { expiresIn: "4h" }
-    );
-
-    // 更新refresh token（每次刷新生成新的refresh token）
-    const newRefreshToken = uuidv4();
-    const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    // 获取客户端信息
     const clientIp =
       req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    const clientInfo = req.headers.get("user-agent") || "unknown";
 
-    // 撤销旧的refresh token
-    await pool.query(
-      "UPDATE auth.refresh_tokens SET is_revoked = true, revoked_at = NOW() WHERE token = $1",
-      [refreshToken]
-    );
+    // 调用server层的刷新逻辑
+    const refreshTokenResponse = await refreshToken(refreshTokenValue, clientInfo, clientIp);
 
-    // 创建新的refresh token
-    await pool.query(
-      "INSERT INTO auth.refresh_tokens (user_id, token, expires_at, client_info, ip_address) VALUES ($1, $2, $3, $4, $5)",
-      [
-        user.rows[0].user_id,
-        newRefreshToken,
-        newExpiresAt,
-        req.headers.get("user-agent") || "unknown",
-        clientIp,
-      ]
-    );
-
-    // 创建响应
-    const response = NextResponse.json({
+    // 创建统一API响应
+    const successResponse: ApiResponse<typeof refreshTokenResponse> = {
       success: true,
       message: "Token刷新成功",
-      user: user.rows[0],
-    });
+      data: refreshTokenResponse,
+      code: ErrorCode.SUCCESS,
+    };
 
-    // 设置新的tokens到cookie
-    response.cookies.set("token", newAccessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 4 * 60 * 60, // 4小时
-    });
+    // 创建响应
+    const response = NextResponse.json(successResponse, { status: 200 });
 
-    response.cookies.set("refresh_token", newRefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60, // 7天
-    });
+    // 设置token和refresh token到cookie
+    setAuthCookies(response, refreshTokenResponse.token, refreshTokenResponse.refresh_token);
 
     return response;
   } catch (error: unknown) {
+    // 处理Prisma特定错误
+    if (error instanceof PrismaClientKnownRequestError) {
+      console.error("Prisma错误:", error);
+      console.error("错误代码:", error.code);
+      console.error("错误元数据:", error.meta);
+
+      // 根据错误代码返回不同的错误信息
+      switch (error.code) {
+        case "P2025":
+          // 记录未找到
+          return NextResponse.json(
+            {
+              success: false,
+              error: "无效的refresh token",
+              code: ErrorCode.UNAUTHORIZED,
+            },
+            { status: 401 }
+          );
+        default:
+          // 其他Prisma错误
+          return NextResponse.json(
+            {
+              success: false,
+              error: "数据库操作失败",
+              details: error.message,
+              code: ErrorCode.SERVER_ERROR,
+            },
+            { status: 500 }
+          );
+      }
+    }
+
     console.error("Refresh token错误:", error);
-    return NextResponse.json({ error: "服务器内部错误" }, { status: 500 });
+
+    // 处理特定错误信息
+    if (error instanceof Error) {
+      if (error.message === "无效的refresh token" || error.message === "用户不存在或已禁用") {
+        return NextResponse.json(
+          {
+            success: false,
+            error: error.message,
+            code: ErrorCode.UNAUTHORIZED,
+          },
+          { status: 401 }
+        );
+      }
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: "服务器内部错误",
+        details: error instanceof Error ? error.message : String(error),
+        code: ErrorCode.SERVER_ERROR,
+      },
+      { status: 500 }
+    );
   }
 }

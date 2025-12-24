@@ -1,0 +1,33 @@
+# Next.js 构建产物（核心忽略）
+.next/
+out/
+
+# 依赖目录（必忽略）
+node_modules/
+
+# 静态资源（无需检测语法）
+public/**/*
+public/workbox-*.js
+**sw.js
+assets/**/*.png
+assets/**/*.jpg
+assets/**/*.svg
+
+# 配置文件（非业务代码）
+*.config.js
+*.config.ts
+next-env.d.ts
+tailwind.config.js
+postcss.config.js
+
+# 临时文件/日志
+*.log
+tmp/
+coverage/ # 测试覆盖率报告
+
+# 第三方/生成的代码
+scripts/generated/
+vendor/
+
+# TypeScript 声明文件（部分可忽略）
+types/*.d.ts

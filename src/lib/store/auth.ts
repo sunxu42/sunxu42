@@ -7,7 +7,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 // User Zod Schema
 export const userSchema = z.object({
   user_id: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   username: z.string(),
   nickname: z.string().optional(),
   avatar_url: z.string().optional(),
@@ -24,13 +24,20 @@ export type User = z.infer<typeof userSchema>;
 const refreshTokenResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  user: userSchema,
+  data: z.object({
+    token: z.string(),
+    refresh_token: z.string(),
+    expires_in: z.number(),
+    user: userSchema,
+  }),
 });
 
 // Profile API Response Zod Schema
 const profileResponseSchema = z.object({
   success: z.boolean(),
-  user: userSchema,
+  data: z.object({
+    user: userSchema,
+  }),
 });
 
 // AuthState Zod Schema (for state properties validation)
@@ -71,7 +78,7 @@ const checkAuthStatus = async () => {
         const validatedData = profileResponseSchema.parse(data);
         if (validatedData.success) {
           // 更新auth store - token有效
-          useAuthStore.getState().login(validatedData.user);
+          useAuthStore.getState().login(validatedData.data.user);
         } else {
           // API返回错误，token可能无效
           useAuthStore.getState().clearLoginState();
@@ -131,7 +138,7 @@ export const useAuthStore = create<AuthState>()(
             const data = await response.json();
             // Validate response data with Zod
             const validatedData = refreshTokenResponseSchema.parse(data);
-            set({ user: validatedData.user, isLoggedIn: true });
+            set({ user: validatedData.data.user, isLoggedIn: true });
             return true;
           } else {
             // 刷新失败，执行登出
@@ -155,7 +162,7 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
       // 在状态恢复后检查认证状态
-      onRehydrateStorage: () => state => {
+      onRehydrateStorage: () => () => {
         // 只在客户端检查认证状态
         if (typeof window !== "undefined") {
           // 无论是否有存储的状态，都检查当前token的有效性

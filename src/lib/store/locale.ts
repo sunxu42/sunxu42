@@ -1,4 +1,4 @@
-import { SUPPORTED_LOCALES, type Locale } from "@/lib/constants";
+import { type Locale } from "@/lib/constants";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -18,7 +18,7 @@ const getBrowserLocale = (): Locale => {
 
 export const useLocaleStore = create<LocaleState>()(
   persist(
-    (set, get) => ({
+    set => ({
       locale: "zh", // 服务器端默认中文
       setLocale: (locale: Locale) => {
         set({ locale });

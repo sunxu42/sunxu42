@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { profileUpdateSchema } from "@/lib/schemas/auth";
 import { useAuthStore } from "@/lib/store/auth";
+import { ProfileUpdateSchema } from "@/types/auth-schemas";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -48,7 +48,7 @@ export default function ProfilePage() {
       const bio = formData.get("bio") as string;
 
       // 客户端验证表单数据
-      profileUpdateSchema.parse({
+      ProfileUpdateSchema.parse({
         username,
         email,
         nickname,

@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { loginRequestSchema } from "@/lib/schemas/auth";
 import { useAuthStore } from "@/lib/store/auth";
+import { LoginApiResponseSchema, LoginRequestSchema } from "@/types/auth-schemas";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -68,7 +68,7 @@ export default function LoginPage() {
 
     try {
       // 客户端验证表单数据
-      loginRequestSchema.parse({ email, password });
+      LoginRequestSchema.parse({ email, password });
 
       const response = await fetch("/api/login", {
         method: "POST",
@@ -80,27 +80,37 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "登录失败");
+      // 使用Zod验证API响应
+      const validatedResponse = LoginApiResponseSchema.parse(data);
+
+      if (validatedResponse.success) {
+        // 登录成功，使用auth store保存用户信息
+        login(validatedResponse.data.user);
+
+        // 跳转到首页
+        router.push("/home");
+      } else {
+        // 处理API返回的错误
+        setError(validatedResponse.details || validatedResponse.error);
       }
-
-      // 登录成功，使用auth store保存用户信息
-      login(data.user);
-
-      // 跳转到首页
-      router.push("/home");
     } catch (err: unknown) {
       if (err instanceof z.ZodError) {
         // 处理zod验证错误
-        const errors: { email?: string; password?: string } = {};
-        err.issues.forEach((error: z.ZodIssue) => {
-          if (error.path[0] === "email") {
-            errors.email = error.message;
-          } else if (error.path[0] === "password") {
-            errors.password = error.message;
-          }
-        });
-        setFieldErrors(errors);
+        if (err.issues.some(issue => issue.path.includes("data"))) {
+          // 响应验证错误
+          setError("服务器返回的数据格式不正确");
+        } else {
+          // 表单验证错误
+          const errors: { email?: string; password?: string } = {};
+          err.issues.forEach((error: z.ZodIssue) => {
+            if (error.path[0] === "email") {
+              errors.email = error.message;
+            } else if (error.path[0] === "password") {
+              errors.password = error.message;
+            }
+          });
+          setFieldErrors(errors);
+        }
       } else {
         setError(err instanceof Error ? err.message : "发生未知错误");
       }

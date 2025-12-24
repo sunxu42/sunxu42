@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 用户表模型
+model User {
+  user_id          String      @id @default(uuid())
+  username         String?
+  email            String      @unique
+  password_hash    String
+  salt             String?
+  status           String
+  default_role_id  String?     @map("default_role_id")
+  last_login_at    DateTime?
+  last_login_ip    String?
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @updatedAt
+
+  // 关联关系
+  profile          UserProfile?
+  userRoles        UserRole[]
+  refreshTokens    RefreshToken[]
+  operationLogs    OperationLog[]
+
+  @@map("users")
+}
+
+// 用户资料表模型
+model UserProfile {
+  profile_id       String  @id @default(uuid())
+  user_id          String  @unique @map("user_id")
+  nickname         String?
+  avatar_url       String? @map("avatar_url")
+  phone            String?
+  gender           String?
+  bio              String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // 关联关系
+  user             User    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// 角色表模型
+model Role {
+  role_id          String      @id @default(uuid())
+  role_name        String      @map("role_name")
+  role_code        String      @unique @map("role_code")
+  role_level       Int         @map("role_level")
+  role_status      Boolean     @map("role_status")
+  description      String?
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @updatedAt
+
+  // 关联关系
+  userRoles        UserRole[]
+
+  @@map("roles")
+}
+
+// 用户角色关联表模型
+model UserRole {
+  id               String    @id @default(uuid())
+  user_id          String    @map("user_id")
+  role_id          String    @map("role_id")
+  created_at       DateTime  @default(now())
+
+  // 关联关系
+  user             User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  role             Role      @relation(fields: [role_id], references: [role_id], onDelete: Cascade)
+
+  @@map("user_roles")
+}
+
+// 刷新令牌表模型
+model RefreshToken {
+  refresh_token_id String    @id @default(uuid()) @map("refresh_token_id")
+  user_id          String    @map("user_id")
+  token            String    @unique
+  expires_at       DateTime  @map("expires_at")
+  is_revoked       Boolean   @default(false) @map("is_revoked")
+  revoked_at       DateTime? @map("revoked_at")
+  client_info      String?   @map("client_info")
+  ip_address       String?   @map("ip_address")
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  // 关联关系
+  user             User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// 操作日志表模型
+model OperationLog {
+  log_id           String    @id @default(uuid()) @map("log_id")
+  user_id          String?   @map("user_id")
+  operation_type   String    @map("operation_type")
+  operation_content String?  @map("operation_content")
+  operation_ip     String?   @map("operation_ip")
+  created_at       DateTime  @default(now())
+
+  // 关联关系
+  user             User?     @relation(fields: [user_id], references: [user_id])
+
+  @@map("operation_logs")
+}

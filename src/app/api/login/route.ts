@@ -1,197 +1,140 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
-import { loginRequestSchema } from "@/lib/schemas/auth";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
+import { login } from "@/server/api/auth/login";
+import { ErrorCode, LoginRequestSchema, LoginResponse, type ApiResponse } from "@/types/index";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { z } from "zod";
+
+// 辅助函数：设置认证cookies
+function setAuthCookies(response: NextResponse, token: string, refreshToken: string) {
+  response.cookies.set("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 4 * 60 * 60, // 4小时
+  });
+
+  response.cookies.set("refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60, // 7天
+  });
+
+  return response;
+}
 
 export async function POST(req: NextRequest) {
   try {
     const requestBody = await req.json();
 
     // 使用zod验证请求数据
-    const { email, password } = loginRequestSchema.parse(requestBody);
+    const { email, password } = LoginRequestSchema.parse(requestBody);
 
-    // 查询用户是否存在
-    const userResult = await pool.query("SELECT * FROM auth.users WHERE email = $1", [email]);
+    // 获取客户端信息
+    const clientIp =
+      req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    const clientInfo = req.headers.get("user-agent") || "unknown";
 
-    if (userResult.rows.length > 0) {
-      // 用户存在，使用数据库的crypt函数验证密码
-      const user = userResult.rows[0];
-      const passwordCheckResult = await pool.query("SELECT crypt($1, $2) = $2 AS is_valid", [
-        password,
-        user.password_hash,
-      ]);
-      const isPasswordValid = passwordCheckResult.rows[0].is_valid;
+    // 调用server层的登录逻辑
+    const loginResponse = await login(email, password, clientInfo, clientIp);
 
-      if (isPasswordValid) {
-        // 更新最后登录时间
-        const clientIp =
-          req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
-        await pool.query(
-          "UPDATE auth.users SET last_login_at = NOW(), last_login_ip = $1 WHERE user_id = $2",
-          [clientIp, user.user_id]
-        );
+    // 创建统一API响应
+    const successResponse: ApiResponse<LoginResponse> = {
+      success: true,
+      message: "登录成功",
+      data: loginResponse,
+      code: ErrorCode.SUCCESS,
+    };
 
-        // 生成JWT token
-        const secretKey = process.env.JWT_SECRET as string;
-        const token = jwt.sign(
-          { user_id: user.user_id, email: user.email, username: user.username },
-          secretKey,
-          { expiresIn: "4h" }
-        );
+    // 创建响应
+    const response = NextResponse.json(successResponse, { status: 200 });
 
-        // 创建响应
-        const response = NextResponse.json(
-          {
-            success: true,
-            message: "登录成功",
-            user: {
-              user_id: user.user_id,
-              email: user.email,
-              username: user.username,
-            },
-          },
-          { status: 200 }
-        );
+    // 设置token和refresh token到cookie
+    setAuthCookies(response, loginResponse.token, loginResponse.refresh_token);
 
-        // 生成refresh token
-        const refreshToken = uuidv4();
-        const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7天过期
-
-        // 存储refresh token到数据库
-        await pool.query(
-          "INSERT INTO auth.refresh_tokens (user_id, token, expires_at, client_info, ip_address) VALUES ($1, $2, $3, $4, $5)",
-          [
-            user.user_id,
-            refreshToken,
-            refreshTokenExpiresAt,
-            req.headers.get("user-agent") || "unknown",
-            clientIp,
-          ]
-        );
-
-        // 设置token到cookie
-        response.cookies.set("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 4 * 60 * 60, // 4小时
-        });
-
-        // 设置refresh token到cookie
-        response.cookies.set("refresh_token", refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 7 * 24 * 60 * 60, // 7天
-        });
-
-        return response;
-      } else {
-        return NextResponse.json({ error: "密码错误" }, { status: 401 });
-      }
-    } else {
-      // 用户不存在，创建新用户
-      const userId = uuidv4();
-      const username = email.split("@")[0]; // 使用邮箱前缀作为默认用户名
-
-      await pool.query(
-        `INSERT INTO auth.users (
-            user_id, username, email, password_hash, status, 
-            created_at, updated_at, last_login_at, last_login_ip
-          ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), NOW(), $6)`,
-        [userId, username, email, password, "active", "unknown"]
-      );
-
-      // 生成JWT token
-      const token = jwt.sign(
-        { user_id: userId, email: email, username: username },
-        process.env.JWT_SECRET as string,
-        { expiresIn: "4h" }
-      );
-
-      // 创建响应
-      const response = NextResponse.json(
-        {
-          success: true,
-          message: "用户创建成功并登录",
-          user: {
-            user_id: userId,
-            email,
-            username,
-          },
-        },
-        { status: 201 }
-      );
-
-      // 生成refresh token
-      const refreshToken = uuidv4();
-      const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7天过期
-
-      // 存储refresh token到数据库
-      const clientIp =
-        req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
-      await pool.query(
-        "INSERT INTO auth.refresh_tokens (user_id, token, expires_at, client_info, ip_address) VALUES ($1, $2, $3, $4, $5)",
-        [
-          userId,
-          refreshToken,
-          refreshTokenExpiresAt,
-          req.headers.get("user-agent") || "unknown",
-          clientIp,
-        ]
-      );
-
-      // 设置token到cookie
-      response.cookies.set("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 4 * 60 * 60, // 4小时
-      });
-
-      // 设置refresh token到cookie
-      response.cookies.set("refresh_token", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7天
-      });
-
-      return response;
-    }
+    return response;
   } catch (error: unknown) {
     // 处理zod验证错误
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
+          success: false,
           error: "请求数据验证失败",
           details: error.issues.map((e: z.ZodIssue) => e.message).join(", "),
+          code: ErrorCode.PARAM_ERROR,
         },
         { status: 400 }
       );
+    }
+
+    // 处理Prisma特定错误
+    if (error instanceof PrismaClientKnownRequestError) {
+      console.error("Prisma错误:", error);
+      console.error("错误代码:", error.code);
+      console.error("错误元数据:", error.meta);
+
+      // 根据错误代码返回不同的错误信息
+      switch (error.code) {
+        case "P2002":
+          // 唯一约束冲突
+          const field = error.meta?.target as string;
+          return NextResponse.json(
+            {
+              success: false,
+              error: field ? `${field}已被占用` : "数据冲突",
+              code: ErrorCode.USER_ALREADY_EXISTS,
+            },
+            { status: 409 }
+          );
+        case "P2025":
+          // 记录未找到
+          return NextResponse.json(
+            {
+              success: false,
+              error: "用户不存在",
+              code: ErrorCode.NOT_FOUND,
+            },
+            { status: 404 }
+          );
+        default:
+          // 其他Prisma错误
+          return NextResponse.json(
+            {
+              success: false,
+              error: "数据库操作失败",
+              details: error.message,
+              code: ErrorCode.SERVER_ERROR,
+            },
+            { status: 500 }
+          );
+      }
     }
 
     console.error("登录错误:", error);
     if (error instanceof Error) {
       console.error("错误详情:", error.message);
     }
-    // 对于其他可能的错误属性，使用可选链和类型断言
-    console.error("错误代码:", (error as any)?.code);
-    console.error("错误位置:", (error as any)?.position);
-    console.error("错误文件:", (error as any)?.file);
-    console.error("错误行号:", (error as any)?.line);
+
+    // 处理密码错误
+    if (error instanceof Error && error.message === "密码错误") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "密码错误",
+          code: ErrorCode.UNAUTHORIZED,
+        },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json(
       {
+        success: false,
         error: "服务器内部错误",
         details: error instanceof Error ? error.message : String(error),
-        code: (error as any)?.code,
+        code: ErrorCode.SERVER_ERROR,
       },
       { status: 500 }
     );

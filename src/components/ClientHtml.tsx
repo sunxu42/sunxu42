@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { SUPPORTED_LOCALES } from "@/lib/constants";
+import { Locale, SUPPORTED_LOCALES } from "@/lib/constants";
 
 interface ClientHtmlProps {
   children: React.ReactNode;
@@ -8,8 +8,8 @@ interface ClientHtmlProps {
 export default async function ClientHtml({ children }: ClientHtmlProps) {
   // 从Cookie获取语言偏好，默认中文
   const cookieStore = await cookies();
-  const userLocale = cookieStore.get("user-locale")?.value;
-  const locale = SUPPORTED_LOCALES.includes(userLocale as any) ? userLocale : "zh";
+  const userLocale = cookieStore.get("user-locale")?.value as Locale | undefined;
+  const locale = SUPPORTED_LOCALES.includes(userLocale as Locale) ? userLocale : "zh";
 
   return (
     <html

@@ -8,7 +8,7 @@ declare module "next-pwa" {
     disable?: boolean;
     scope?: string;
     sw?: string;
-    additionalManifestEntries?: any[];
+    additionalManifestEntries?: unknown[];
     publicExcludes?: string[];
     buildExcludes?: string[];
     cacheOnFrontEndNav?: boolean;

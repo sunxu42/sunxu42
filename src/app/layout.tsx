@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import ClientHtml from "@/components/ClientHtml";
+import { Header } from "@/components/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
-import HeaderWrapper from "./header-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,10 +49,10 @@ export default async function RootLayout({
           enableSystem
           themes={["light", "dark"]}
           disableTransitionOnChange={true}
-          storageKey="my-custom-theme"
+          storageKey="theme"
         >
           <NextIntlClientProvider locale={locale} messages={messages}>
-            <HeaderWrapper />
+            <Header />
             <main className="w-full max-w-7xl mx-auto flex justify-center px-4 sm:px-6">
               {children}
             </main>

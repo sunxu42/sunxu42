@@ -25,6 +25,14 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    "@typescript-eslint/no-unused-vars": [
+      "off",
+      {
+        args: "after-used",
+        argsIgnorePattern: "^_",
+        ignoreRestSiblings: true,
+      },
+    ],
     "@typescript-eslint/no-unused-imports": "error",
     "import/order": [
       "error",
@@ -51,6 +59,7 @@ module.exports = {
     "import/default": "error",
     "import/export": "error",
   },
+  exclude: ["**/*.config.js", "**/*.config.ts", "**sw.js", "public/**/*"],
   settings: {
     "import/resolver": {
       typescript: {
