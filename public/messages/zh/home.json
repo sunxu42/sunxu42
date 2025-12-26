@@ -1,0 +1,8 @@
+{
+  "title": "首页",
+  "welcome": "欢迎来到我的网站",
+  "description": "这是一个使用Next.js、TypeScript和Tailwind CSS构建的现代化网站",
+  "features": "功能特性",
+  "contact": "联系我们",
+  "learnMore": "了解更多"
+}

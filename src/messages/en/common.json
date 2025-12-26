@@ -1,0 +1,22 @@
+{
+  "notFound": "Page not found",
+  "goHome": "Go to Home",
+  "themeToggle": "Toggle theme",
+  "languageToggle": "Toggle language",
+  "title": "Home",
+  "welcome": "Welcome to my website",
+  "description": "This is a modern website built with Next.js, TypeScript and Tailwind CSS",
+  "features": {
+    "feature1": {
+      "title": "Feature 1",
+      "description": "This is a feature description"
+    },
+    "feature2": {
+      "title": "Feature 2",
+      "description": "This is another feature description"
+    }
+  },
+  "footer": {
+    "copyright": "© {year} sunxu42. All rights reserved."
+  }
+}

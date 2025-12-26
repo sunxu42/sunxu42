@@ -1,0 +1,8 @@
+{
+  "title": "Home",
+  "welcome": "Welcome to my website",
+  "description": "This is a modern website built with Next.js, TypeScript and Tailwind CSS",
+  "features": "Features",
+  "contact": "Contact Us",
+  "learnMore": "Learn More"
+}

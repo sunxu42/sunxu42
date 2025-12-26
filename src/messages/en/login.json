@@ -1,0 +1,13 @@
+{
+  "title": "Login",
+  "email": "Email",
+  "password": "Password",
+  "loginButton": "Login",
+  "errors": {
+    "invalidEmail": "Invalid email format",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "invalidCredentials": "Invalid email or password",
+    "loginFailed": "Login failed, please try again",
+    "unknownError": "An unknown error occurred"
+  }
+}

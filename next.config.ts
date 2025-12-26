@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import withPWA from "next-pwa";
+import { ELocale } from "./src/models/enums/i18n";
 
-const nextIntlPlugin = createNextIntlPlugin("./src/i18n.ts");
+const nextIntlPlugin = createNextIntlPlugin("./src/app/i18n.ts");
 
 const pwaOptions = {
   dest: "public",
@@ -12,10 +13,12 @@ const pwaOptions = {
 };
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
-  // 添加turbopack配置以避免构建错误
   turbopack: {},
+  env: {
+    NEXT_PUBLIC_DEFAULT_LOCALE: ELocale.ZH,
+    NEXT_PUBLIC_SUPPORTED_LOCALES: JSON.stringify(Object.values(ELocale)),
+  },
 };
 
 export default nextIntlPlugin(withPWA(pwaOptions)(nextConfig));

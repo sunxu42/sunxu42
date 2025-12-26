@@ -1,0 +1,22 @@
+{
+  "notFound": "页面未找到",
+  "goHome": "返回首页",
+  "themeToggle": "切换主题",
+  "languageToggle": "切换语言",
+  "title": "首页",
+  "welcome": "欢迎来到我的网站",
+  "description": "这是一个使用Next.js、TypeScript和Tailwind CSS构建的现代化网站",
+  "features": {
+    "feature1": {
+      "title": "功能特性 1",
+      "description": "这是一个功能特性描述"
+    },
+    "feature2": {
+      "title": "功能特性 2",
+      "description": "这是另一个功能特性描述"
+    }
+  },
+  "footer": {
+    "copyright": "© {year} sunxu42. All rights reserved."
+  }
+}

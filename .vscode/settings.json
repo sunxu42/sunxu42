@@ -14,9 +14,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit", // 核心：自动整理导入（删除无效 + 排序）
     "source.fixAll.eslint": "explicit", // 自动修复 ESLint 错误（包括未使用变量提示）
     "source.fixAll.prettier": "explicit" // 自动执行 Prettier 格式化
