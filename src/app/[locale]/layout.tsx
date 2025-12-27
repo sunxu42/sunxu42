@@ -1,21 +1,25 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { cookies } from "next/headers";
+import { auth } from "@/auth";
 import { ETheme } from "@/models/enums/theme";
 import { getCookie } from "cookies-next";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
+import { SessionProvider } from "@/components/providers/session-provider";
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -39,13 +43,16 @@ export default async function RootLayout({
   const theme = cookieTheme || ETheme.LIGHT;
 
   const messages = await getMessages();
+  const session = await auth();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang={locale} suppressHydrationWarning className={theme === "dark" ? "dark" : ""}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased flex justify-center items-center min-h-screen`}
+      >
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider attribute="class" storageKey="app:theme" defaultTheme={theme} enableSystem>
-            {children}
+            <SessionProvider session={session}>{children}</SessionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

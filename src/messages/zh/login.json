@@ -3,6 +3,8 @@
   "email": "邮箱",
   "password": "密码",
   "loginButton": "登录",
+  "guestLoginButton": "以游客身份登录",
+  "loading": "加载中...",
   "errors": {
     "invalidEmail": "邮箱格式不正确",
     "passwordTooShort": "密码长度不能少于6位",

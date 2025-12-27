@@ -8,7 +8,7 @@ export default function Home() {
   const homeT = useTranslations("home");
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="w-full min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="container flex h-16 items-center justify-between px-4 mx-auto">
           <div className="flex items-center gap-2">
@@ -21,7 +21,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container px-4 py-8 mx-auto min-w-[280px] lg:min-w-[600px]">
+      <main className="px-4 py-8 w-full">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">{homeT("welcome")}</h2>
           <p className="text-lg text-muted-foreground">{homeT("description")}</p>

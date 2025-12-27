@@ -3,6 +3,8 @@
   "email": "Email",
   "password": "Password",
   "loginButton": "Login",
+  "guestLoginButton": "Login as Guest",
+  "loading": "Loading...",
   "errors": {
     "invalidEmail": "Invalid email format",
     "passwordTooShort": "Password must be at least 6 characters",

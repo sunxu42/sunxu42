@@ -50,5 +50,4 @@ public/sw.js
 public/workbox-*.js
 public/workbox-*.js.map
 
-/src/generated/prisma
-/src/generated/zod
+src/generated/zod
