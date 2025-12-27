@@ -5,5 +5,5 @@ export default async function RootPage() {
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get("NEXT_LOCALE");
   const locale = cookieLocale?.value || "zh";
-  redirect(`/${locale}/home`);
+  redirect(`/${locale}`);
 }

@@ -4,6 +4,8 @@
   "themeToggle": "Toggle theme",
   "languageToggle": "Toggle language",
   "title": "Home",
+  "login": "Login",
+  "animation": "Animations",
   "welcome": "Welcome to my website",
   "description": "This is a modern website built with Next.js, TypeScript and Tailwind CSS",
   "features": {

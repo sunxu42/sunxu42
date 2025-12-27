@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import loginAnimation from "@/assets/animations/login.json";
+import { LottieAnimations } from "@/constants/lottie";
 import { loginSchema, type LoginInput } from "@/schemas/auth";
-import type { LottieRefCurrentProps } from "lottie-react";
-import Lottie from "lottie-react";
+import { DotLottie, DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -46,7 +45,7 @@ function useDelayedUpdate<T>(value: T, delay: number, onUpdate: (value: T) => vo
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const lottieRef = useRef<LottieRefCurrentProps | null>(null);
+  const dotLottieRef = useRef<DotLottie | null>(null);
   const [formData, setFormData] = useState<LoginInput>({
     email: "",
     password: "",
@@ -80,7 +79,7 @@ export default function LoginPage() {
   }, [errorParam, t]);
 
   useDelayedUpdate(pendingResult, 3000, result => {
-    lottieRef.current?.stop();
+    dotLottieRef.current?.stop();
     setIsLoading(false);
     if (result?.success) {
       router.push("/home");
@@ -118,7 +117,7 @@ export default function LoginPage() {
       } else {
         setPending({ success: true });
       }
-      lottieRef.current?.play();
+      dotLottieRef.current?.play();
     } catch (err: unknown) {
       if (err instanceof z.ZodError) {
         const errors: Partial<Record<keyof LoginInput, string>> = {};
@@ -131,7 +130,7 @@ export default function LoginPage() {
       } else {
         const errorMessage = err instanceof Error ? err.message : t("errors.unknownError");
         setPending({ success: false, error: errorMessage });
-        lottieRef.current?.play();
+        dotLottieRef.current?.play();
       }
     }
   };
@@ -163,7 +162,7 @@ export default function LoginPage() {
         setIsLoading(false);
       } else {
         setPending({ success: true });
-        lottieRef.current?.play();
+        dotLottieRef.current?.play();
       }
     } catch (err) {
       setError(t("errors.unknownError"));
@@ -180,12 +179,14 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col md:flex-row items-center justify-center gap-8 w-full max-w-6xl mx-auto p-4">
       <div className="w-full md:w-1/2 items-center justify-center hidden laptop:flex">
-        <Lottie
-          lottieRef={lottieRef}
+        <DotLottieReact
+          src={LottieAnimations.LOGIN.path}
           autoplay={false}
-          animationData={loginAnimation}
           loop={false}
           className="w-full max-w-md"
+          dotLottieRefCallback={dotLottie => {
+            dotLottieRef.current = dotLottie;
+          }}
         />
       </div>
       <div className="min-w-[280px] md:min-w-[480px] max-w-[480px]">

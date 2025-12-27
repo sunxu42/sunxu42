@@ -4,6 +4,8 @@
   "themeToggle": "切换主题",
   "languageToggle": "切换语言",
   "title": "首页",
+  "login": "登录",
+  "animation": "动画展示",
   "welcome": "欢迎来到我的网站",
   "description": "这是一个使用Next.js、TypeScript和Tailwind CSS构建的现代化网站",
   "features": {

@@ -9,3 +9,4 @@
 9. 这个项目支持中英双文，每个页面做修改时应该考虑到使用i18n。
 10. 每次引入依赖时应该考虑到是不是只有dev时需要，prod不需要。
 11. 使用zod时，email和url都不需要使用.string()，直接使用z.email()和z.url()即可。
+12. 在这个项目中，使用useEffect hook的时候，都考虑一下是不是使用react 19新提供的hooks, 会更加合适，比如useEffectEvent。
