@@ -1,0 +1,27 @@
+{
+  "title": "VC",
+  "description": "VC页面描述",
+  "nav": {
+    "home": "首页",
+    "aboutMe": "关于我",
+    "projects": "项目",
+    "contactMe": "联系我"
+  },
+  "home": {
+    "title": "首页",
+    "name": "孙旭",
+    "role": "前端开发",
+    "description": "专注于创建优雅、高效的用户界面，热爱探索新技术，致力于提供卓越的用户体验。"
+  },
+  "aboutMe": {
+    "title": "关于我",
+    "subtitle": "Angular, React 大师",
+    "description": "曾热衷于使用TypeScript、Scss和HTML精细打磨每一行代码。如今借助AI、Next.js、Tailwind、shadcn和Prisma，高效构建现代化的Web应用。"
+  },
+  "projects": {
+    "title": "项目"
+  },
+  "contactMe": {
+    "title": "联系我"
+  }
+}

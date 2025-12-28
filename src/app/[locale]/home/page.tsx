@@ -19,6 +19,13 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
+              onClick={() => router.push(`/${locale}/vc`)}
+              className="cursor-pointer"
+            >
+              VC
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => router.push(`/${locale}/login`)}
               className="cursor-pointer"
             >

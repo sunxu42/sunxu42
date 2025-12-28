@@ -1,0 +1,27 @@
+{
+  "title": "VC",
+  "description": "VC page description",
+  "nav": {
+    "home": "Home",
+    "aboutMe": "About Me",
+    "projects": "Projects",
+    "contactMe": "Contact Me"
+  },
+  "home": {
+    "title": "Home",
+    "name": "Arthur Sun",
+    "role": "Front End Developer",
+    "description": "Focused on creating elegant and efficient user interfaces, passionate about exploring new technologies, dedicated to providing excellent user experiences."
+  },
+  "aboutMe": {
+    "title": "About Me",
+    "subtitle": "Master of Angular, React",
+    "description": "Previously enjoyed fine-tuning every line of code with TypeScript, Scss, and HTML. Now leveraging AI, Next.js, Tailwind, shadcn, and Prisma to efficiently build modern web applications."
+  },
+  "projects": {
+    "title": "Projects"
+  },
+  "contactMe": {
+    "title": "Contact Me"
+  }
+}

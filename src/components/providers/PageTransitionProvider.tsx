@@ -4,35 +4,28 @@ import { usePathname } from "next/navigation";
 import { LottieAnimations } from "@/constants/lottie";
 import { DotLottie, DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-const TRANSITION_ROUTES = ["login", "profile"];
+const TRANSITION_ROUTES = ["vc", "profile"];
 
 export function PageTransitionProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const prevPathnameRef = useRef(pathname);
-  const hasStartedTransitionRef = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const dotLottieRef = useRef<DotLottie | null>(null);
   const isMountedRef = useRef(true);
+  const prevPathnameRef = useRef(pathname);
+  const hasInitializedRef = useRef(false);
 
-  const shouldTransition = (path1: string, path2: string) => {
-    const route1 = path1.split("/").filter(Boolean)[1] || "";
-    const route2 = path2.split("/").filter(Boolean)[1] || "";
-
-    return TRANSITION_ROUTES.includes(route1) || TRANSITION_ROUTES.includes(route2);
+  const shouldShowTransition = (path: string) => {
+    const route = path.split("/").filter(Boolean)[1] || "";
+    return TRANSITION_ROUTES.includes(route);
   };
 
-  const startTransition = useEffectEvent(() => {
-    setIsTransitioning(true);
-  });
-
-  const endTransition = useEffectEvent(() => {
-    setIsTransitioning(false);
-    prevPathnameRef.current = pathname;
-    hasStartedTransitionRef.current = false;
-  });
+  const getRouteWithoutLocale = (path: string) => {
+    const parts = path.split("/").filter(Boolean);
+    return parts.length > 1 ? parts.slice(1).join("/") : "";
+  };
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -47,34 +40,42 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     };
   }, []);
 
-  useEffect(() => {
-    if (pathname !== prevPathnameRef.current && !hasStartedTransitionRef.current) {
-      if (shouldTransition(pathname, prevPathnameRef.current)) {
-        hasStartedTransitionRef.current = true;
-
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }
-
-        startTransition();
-
-        timerRef.current = setTimeout(() => {
-          if (isMountedRef.current) {
-            endTransition();
-          }
-        }, 1200);
-
-        return () => {
-          if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
-          }
-        };
-      } else {
-        prevPathnameRef.current = pathname;
-      }
+  useLayoutEffect(() => {
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      prevPathnameRef.current = pathname;
+      return;
     }
+
+    const currentRoute = getRouteWithoutLocale(pathname);
+    const prevRoute = getRouteWithoutLocale(prevPathnameRef.current);
+
+    if (!shouldShowTransition(pathname) || currentRoute === prevRoute) {
+      prevPathnameRef.current = pathname;
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      setIsTransitioning(true);
+    });
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    timerRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        setIsTransitioning(false);
+      }
+    }, 1200);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [pathname]);
 
   return (
@@ -87,11 +88,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-background"
-            onAnimationComplete={() => {
-              if (!isTransitioning && dotLottieRef.current) {
-                dotLottieRef.current.stop();
-              }
-            }}
           >
             <div className="w-64 h-64">
               <DotLottieReact

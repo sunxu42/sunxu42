@@ -9,7 +9,7 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   // 安全地获取当前 locale
-  const currentLocale = pathname.split("/")[1] as ELocale || ELocale.ZH;
+  const currentLocale = (pathname.split("/")[1] as ELocale) || ELocale.ZH;
 
   // 确保 locale 是有效的
   if (!Object.values(ELocale).includes(currentLocale)) {
@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
       onClick={toggleLanguage}
       className="cursor-pointer rounded-full"
     >
-      <span className="text-sm font-medium">{currentLocale === ELocale.ZH ? "中文" : "EN"}</span>
+      <span className="text-sm font-medium">{currentLocale === ELocale.ZH ? "EN" : "中文"}</span>
     </Button>
   );
 }

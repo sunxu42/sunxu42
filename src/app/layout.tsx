@@ -33,7 +33,7 @@ export default async function RootLayout({
 
   return (
     <html suppressHydrationWarning className={theme === "dark" ? "dark" : ""}>
-      <body className="w-full antialiased flex justify-center items-center min-h-screen">
+      <body className="w-full min-h-screen animate-transition antialiased">
         <ThemeProvider attribute="class" storageKey="app:theme" defaultTheme={theme} enableSystem>
           <SessionProvider session={session}>
             <PageTransitionProvider>{children}</PageTransitionProvider>

@@ -12,10 +12,12 @@ export default getRequestConfig(async ({ requestLocale }) => {
     import(`../messages/${locale}/common.json`),
     import(`../messages/${locale}/home.json`),
     import(`../messages/${locale}/login.json`),
-  ]).then(([common, home, login]) => ({
+    import(`../messages/${locale}/vc.json`),
+  ]).then(([common, home, login, vc]) => ({
     common: common.default,
     home: home.default,
     login: login.default,
+    vc: vc.default,
   }));
 
   return {

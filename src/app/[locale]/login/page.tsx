@@ -5,7 +5,7 @@ import { LottieAnimations } from "@/constants/lottie";
 import { loginSchema, type LoginInput } from "@/schemas/auth";
 import { DotLottie, DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { signIn, useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/components/ui";
@@ -45,6 +45,7 @@ function useDelayedUpdate<T>(value: T, delay: number, onUpdate: (value: T) => vo
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
   const dotLottieRef = useRef<DotLottie | null>(null);
   const [formData, setFormData] = useState<LoginInput>({
     email: "",
@@ -60,9 +61,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === "authenticated" && session) {
-      router.push("/home");
+      router.push(`/${locale}/home`);
     }
-  }, [status, session, router]);
+  }, [status, session, router, locale]);
 
   const errorParam = searchParams.get("error");
   const urlErrorProcessedRef = useRef(false);
@@ -82,7 +83,7 @@ export default function LoginPage() {
     dotLottieRef.current?.stop();
     setIsLoading(false);
     if (result?.success) {
-      router.push("/home");
+      router.push(`/${locale}/home`);
     } else if (result?.error) {
       setError(result.error);
     } else if (result?.fieldErrors) {
@@ -177,13 +178,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center gap-8 w-full max-w-6xl mx-auto p-4">
-      <div className="w-full md:w-1/2 items-center justify-center hidden laptop:flex">
+    <div className="flex flex-row items-center justify-center gap-8 w-full min-h-screen max-w-8xl mx-auto p-4">
+      <div className="w-[480px] h-[480px] items-center justify-center hidden laptop:flex">
         <DotLottieReact
           src={LottieAnimations.LOGIN.path}
           autoplay={false}
           loop={false}
-          className="w-full max-w-md"
+          className="w-full h-full"
           dotLottieRefCallback={dotLottie => {
             dotLottieRef.current = dotLottie;
           }}
