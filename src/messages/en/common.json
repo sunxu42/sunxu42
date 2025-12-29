@@ -20,5 +20,11 @@
   },
   "footer": {
     "copyright": "© {year} sunxu42. All rights reserved."
-  }
+  },
+  "jsVersion": "JavaScript Version",
+  "wasmVersion": "Rust-Wasm Version",
+  "particleCount": "Particle Count",
+  "start": "Start",
+  "stop": "Stop",
+  "fps": "FPS"
 }
