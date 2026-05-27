@@ -1,7 +1,7 @@
 ## app template
 
 Monorepo scaffold:
-- `frontend`: Vite + React
+- `frontend`: Vite + React + TypeScript
 - `backend`: FastAPI + SQLite
 - `deploy`: Nginx + systemd + deploy scripts
 
