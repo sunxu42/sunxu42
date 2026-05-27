@@ -1,0 +1,53 @@
+{
+  "changelists": [
+    {
+      "name": "Default",
+      "files": [
+        ".gitignore",
+        "README.md",
+        ".env.example",
+        "backend/.env.development",
+        "backend/.env.production",
+        "backend/alembic/.gitkeep",
+        "backend/app/__init__.py",
+        "backend/app/api/.gitkeep",
+        "backend/app/core/.gitkeep",
+        "backend/app/main.py",
+        "backend/app/models/.gitkeep",
+        "backend/app/repositories/.gitkeep",
+        "backend/app/schemas/.gitkeep",
+        "backend/app/services/.gitkeep",
+        "backend/data/.gitkeep",
+        "backend/requirements.txt",
+        "deploy/nginx/app.conf",
+        "deploy/scripts/healthcheck.sh",
+        "deploy/scripts/install.sh",
+        "deploy/scripts/restart.sh",
+        "deploy/scripts/rollback.sh",
+        "deploy/systemd/app-backend.service",
+        "frontend/.env.development",
+        "frontend/.env.production",
+        "frontend/components.json",
+        "frontend/index.html",
+        "frontend/jsconfig.json",
+        "frontend/package-lock.json",
+        "frontend/package.json",
+        "frontend/postcss.config.js",
+        "frontend/src/App.jsx",
+        "frontend/src/app/.gitkeep",
+        "frontend/src/components/ui/.gitkeep",
+        "frontend/src/components/ui/button.jsx",
+        "frontend/src/features/.gitkeep",
+        "frontend/src/index.css",
+        "frontend/src/main.jsx",
+        "frontend/src/shared/.gitkeep",
+        "frontend/tailwind.config.js",
+        "frontend/vite.config.js",
+        "scripts/build.sh",
+        "scripts/dev.sh",
+        "scripts/release.sh"
+      ]
+    }
+  ],
+  "active": "Default"
+}

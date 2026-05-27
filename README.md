@@ -1,3 +1,33 @@
+## app template
+
+Monorepo scaffold:
+- `frontend`: Vite + React
+- `backend`: FastAPI + SQLite
+- `deploy`: Nginx + systemd + deploy scripts
+
+### Local development
+
+Backend:
+```bash
+cd backend
+python -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Build release
+
+```bash
+./scripts/release.sh
+```
 ## Hi there 👋
 
 <!--
